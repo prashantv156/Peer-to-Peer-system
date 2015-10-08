@@ -1,33 +1,33 @@
 from socket import *
-
-
-def parse_request(str):
-	cmd = ""
-	headers = {}
-
-	req_arr = str.strip().split("\r\n")	# clean up string and get lines
-
-	cmd = req_arr[0].split(" ")			# parse the Command
-
-	for l in req_arr[1:]:				# parse headers
-		hdr = l.strip().split(" ")
-		headers[hdr[0]] = " ".join(hdr[1:])
-
-	print cmd
-	print headers
-
+from P2S_Protocol import *
 
 serverPort = 12000
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
 serverSocket.listen(1)
 
+rfc_lookup_ht = {}
+
+def rfc_lookup_insert(k, v):
+	print k, v, "key, val"
+	rfc_lookup_ht[k] = v
+	# TODO - handle duplicates
+
+
 print ('The server is ready to receive')
 while 1:
      connectionSocket, addr = serverSocket.accept()
 
-     req = connectionSocket.recv(1024)
-     parse_request(req)
+     # get the Request and parse it
+     cmd, headers = parse_request(connectionSocket.recv(1024))
+     print cmd, headers
+
+     if cmd[P2S_CMD] == 'ADD':
+     	rfc_lookup_insert( cmd[ADD_RFC_NUM], (addr[0], int(headers['Port'])) )
+
+     P2S_cmd_handler[cmd[0]]()
+
+     print rfc_lookup_ht
      break;	# DEBUG
 
 connectionSocket.close()
