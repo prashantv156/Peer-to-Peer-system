@@ -15,7 +15,7 @@ def createLISTMessage(serverAddress, serverPort):
     return (listMessage)
 
 def checkServerResponse():
-    
+    pass
 
    
 rfcNumber = 237
