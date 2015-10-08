@@ -26,6 +26,7 @@ serverSocket.listen(1)
 print ('The server is ready to receive')
 while 1:
      connectionSocket, addr = serverSocket.accept()
+
      req = connectionSocket.recv(1024)
      parse_request(req)
      break;	# DEBUG
