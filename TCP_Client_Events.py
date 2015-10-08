@@ -1,3 +1,16 @@
+##def main():
+##
+##    rfcNumber = '247'
+##    serverAddress = '10.139.50.209'
+##    serverPort = '7734'
+##    rfcTitle = 'IP project'
+##
+##    createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle)
+##    createLOOKUPMessage(rfcNumber, serverAddress, serverPort, rfcTitle)
+##    createLISTMessage(serverAddress, serverPort)
+##
+##main()
+
 import socket
 
 def createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
@@ -30,8 +43,6 @@ bufferSize = 4096
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((serverAddress, serverPort))
 s.send(createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle))
-s.send(createLOOKUPMessage(rfcNumber, serverAddress, serverPort, rfcTitle))
-s.send(createLISTMessage(serverAddress, serverPort))
 #data = s.recv(BUFFER_SIZE)
 s.close()
 #print "received data:", data
