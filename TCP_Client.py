@@ -4,7 +4,7 @@ import socket
 TCP_IP = '10.139.58.194'
 TCP_PORT = 12000
 BUFFER_SIZE = 1024
-MESSAGE = "Hello, World!"
+MESSAGE = "Hello !"
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
