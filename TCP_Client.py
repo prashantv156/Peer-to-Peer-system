@@ -1,32 +1,26 @@
 import socket
 
 def createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
-
-    
-    addMessage = 'ADD' + ' ' + 'RFC' + ' ' + rfcNumber + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + serverPort + '\r\n' + 'Title: ' + rfcTitle + '\r\n'
-    print(addMessage)
+    addMessage = 'ADD' + ' ' + 'RFC' + ' ' + str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + str(serverPort) + '\r\n' + 'Title: ' + rfcTitle + '\r\n'
+    return (addMessage)
     
 
 def createLOOKUPMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
-
-    
-    lookupMessage = 'LOOKUP' + ' ' + 'RFC' + ' ' +  rfcNumber + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + serverPort + '\r\n' + 'Title: ' + rfcTitle + '\r\n'
-    print(lookupMessage)
+    lookupMessage = 'LOOKUP' + ' ' + 'RFC' + ' ' +  str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + str(serverPort) + '\r\n' + 'Title: ' + rfcTitle + '\r\n'
+    return (lookupMessage)
 
      
 def createLISTMessage(serverAddress, serverPort):
-
-    
-    listMessage = 'LIST ALL' + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + serverPort + '\r\n'
-    print(listMessage)
+    listMessage = 'LIST ALL' + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + str(serverPort) + '\r\n'
+    return (listMessage)
 
 def checkServerResponse():
     
 
    
-rfcNumber = '237'
+rfcNumber = 237
 rfcTitle = 'Day 0: IP Project'
-serverAddress = '10.139.58.194'
+serverAddress = 'localhost'
 serverPort = 12000
 bufferSize = 4096
 
