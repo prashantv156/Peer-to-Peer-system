@@ -1,17 +1,34 @@
-def parse_request(str):
-	cmd = ""
-	hdrs = {}
+def parse_requests(str):
 
-	req_arr = str.strip().split("\r\n")	# clean up string and get lines
+	cmd, hdrs = "", {}
+	ret = []	# Parsed Request Command Queue
 
-	cmd = req_arr[0].split(" ")			# parse the Command
+	# Can get multiple request packets in a message.
+	# Split based on P2S end-of-request delimiter
 
-	for l in req_arr[1:]:				# parse headers
-		hdr = l.strip().split(" ")
-		hdrs[hdr[0][:-1]] = " ".join(hdr[1:])
-					# ^-- remove the ":" at the end of each header_name
+	for req in str.strip().split("\r\n\r\n"):
+		# re-init
+		cmd, hdrs = "", {}
 
-	return (cmd, hdrs)
+		# clean up string and get lines
+		req_lns = req.strip().split("\r\n")	
+
+		# parse the P2S Command line
+		cmd = req_lns[0].split(" ")			
+
+		# parse P2S header lines
+		for l in req_lns[1:]:				
+			hdr = l.strip().split(" ")
+			hdrs[hdr[0][:-1]] = " ".join(hdr[1:])
+						# ^-- removes the ":" at the end of each header_name
+	
+		# add parsed command to the queue
+		ret.append((cmd, hdrs))
+
+	return (ret)
+
+
+
 
 P2S_CMD = 0
 ADD_RFC_NUM = 2

@@ -24,17 +24,23 @@ def openTCPSocketAndGetResponse(serverAddress, serverPort, bufferSize, clientRfc
 
 
 def createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
-    addMessage = 'ADD' + ' ' + 'RFC' + ' ' + str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + str(serverPort) + '\r\n' + 'Title: ' + rfcTitle + '\r\n'
+    addMessage =  'ADD' + ' ' + 'RFC' + ' ' + str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + \
+                  'Host: '  + serverAddress   + '\r\n' + \
+                  'Port: '  + str(serverPort) + '\r\n' + \
+                  'Title: ' + rfcTitle        + '\r\n' + '\r\n'
     return (addMessage)
-    
 
 def createLOOKUPMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
-    lookupMessage = 'LOOKUP' + ' ' + 'RFC' + ' ' +  str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + str(serverPort) + '\r\n' + 'Title: ' + rfcTitle + '\r\n'
+    lookupMessage = 'LOOKUP' + ' ' + 'RFC' + ' ' +  str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + \
+                    'Host: '  +  serverAddress   + '\r\n' + \
+                    'Port: '  +  str(serverPort) + '\r\n' + \
+                    'Title: ' + rfcTitle        + '\r\n' + '\r\n'
     return (lookupMessage)
-
      
 def createLISTMessage(serverAddress, serverPort):
-    listMessage = 'LIST ALL' + ' ' + 'P2P-CI/1.0\r\n' + 'Host: ' + serverAddress + '\r\n' + 'Port: ' + str(serverPort) + '\r\n'
+    listMessage = 'LIST ALL' + ' ' + 'P2P-CI/1.0\r\n' + \
+                  'Host: ' + serverAddress    + '\r\n' + \
+                  'Port: ' + str(serverPort)  + '\r\n' + '\r\n'
     return (listMessage)
 
 def checkServerResponse():
