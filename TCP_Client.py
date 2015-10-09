@@ -41,6 +41,7 @@ def checkServerResponse():
     pass
 
 
+
 serverAddress = 'localhost'
 serverPort = 12000
 bufferSize = 4096
