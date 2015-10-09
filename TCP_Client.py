@@ -17,9 +17,9 @@ def openTCPSocketAndGetResponse(serverAddress, serverPort, bufferSize, clientRfc
            rfcNumber = key
            rfcTitle = clientRfcDictionary[rfcNumber]
            s.send(createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle))
-       
-##    serverResponse = s.recv(bufferSize)
-##    print(serverResponse)
+
+    serverResponse = s.recv(bufferSize)
+    print(serverResponse)
     s.close()
 
 

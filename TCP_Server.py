@@ -6,12 +6,21 @@ serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
 serverSocket.listen(1)
 
-rfc_lookup_ht = {}
+# RFC hash-table
+rfc_ht = {}
 
-def rfc_lookup_insert(k, v):
-	print k, v, "key, val"
-	rfc_lookup_ht[k] = v
-	# TODO - handle duplicates
+def rfc_ht_insert(k, v):
+     # init
+     if k not in rfc_ht:
+          rfc_ht[k] = []
+
+     # skip if duplicate
+     if v in rfc_ht[k]:
+          return
+
+     # insert
+     rfc_ht[k].append(v)
+
 
 
 print ('The server is ready to receive')
@@ -19,16 +28,25 @@ while 1:
      connectionSocket, addr = serverSocket.accept()
 
      # Parse P2S requests from the TCP buffer
-     for cmd, headers in parse_requests(connectionSocket.recv(1024)):
-          #print cmd, headers
+     for (cmd, rfc, ver), headers in parse_requests(connectionSocket.recv(2048)):
 
-          if cmd[P2S_CMD] == 'ADD':
-               rfc_lookup_insert( cmd[ADD_RFC_NUM], (addr[0], int(headers['Port'])) )
+          if cmd == 'ADD':
+               print "ADD - ", rfc
 
-          #P2S_cmd_handler[cmd[0]]()
+               # Add entry onto the Hash Table
+               rfc_ht_insert( rfc, (addr[0], int(headers['Port'])) )
 
-     print rfc_lookup_ht
-     break;	# DEBUG
+               # Send Response back to Client (ACK)
+               connectionSocket.send( generate_response(cmd, rfc, ver, headers) )
+
+          if cmd == 'LOOKUP':
+               print "LOOKUP - "
+
+          if cmd == 'LIST':
+               print "LIST - ALL"
+               print rfc_ht[rfc_ht.keys()[0]]
+
+     #break;	# DEBUG
 
 connectionSocket.close()
 serverSocket.close()
