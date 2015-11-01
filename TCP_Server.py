@@ -1,11 +1,13 @@
 from socket import *
 from P2S_Protocol import *
 
+
 serverPort = 12000
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
 serverSocket.listen(1)
 
+    
 # RFC hash-table
 rfc_ht = {}
 
@@ -24,11 +26,15 @@ def rfc_ht_insert(k, v):
 
 
 print ('The server is ready to receive')
-while 1:
-     connectionSocket, addr = serverSocket.accept()
+     
+connectionSocket, addr = serverSocket.accept()
+     
+while True:
+
+     message = connectionSocket.recv(4096)
 
      # Parse P2S requests from the TCP buffer
-     for (cmd, rfc, ver), headers in parse_requests(connectionSocket.recv(2048)):
+     for (cmd, rfc, ver), headers in parse_requests(message):
 
           if cmd == 'ADD':
                print "ADD - ", rfc
@@ -50,3 +56,6 @@ while 1:
 
 connectionSocket.close()
 serverSocket.close()
+
+
+   
