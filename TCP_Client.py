@@ -1,4 +1,5 @@
 import socket
+from C2S_Protocol import *
 
 def openTCPSocketAndGetResponse(serverAddress, serverPort, bufferSize, clientRfcDictionary):
 
@@ -30,41 +31,14 @@ def openTCPSocketAndGetResponse(serverAddress, serverPort, bufferSize, clientRfc
     print "Socket Closed."
 
 
-def createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
-    addMessage =  'ADD' + ' ' + 'RFC' + ' ' + str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + \
-                  'Host: '  + serverAddress   + '\r\n' + \
-                  'Port: '  + str(serverPort) + '\r\n' + \
-                  'Title: ' + rfcTitle        + '\r\n' + '\r\n'
-    return (addMessage)
-
-def createLOOKUPMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
-    lookupMessage = 'LOOKUP' + ' ' + 'RFC' + ' ' +  str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + \
-                    'Host: '  +  serverAddress   + '\r\n' + \
-                    'Port: '  +  str(serverPort) + '\r\n' + \
-                    'Title: ' +  rfcTitle        + '\r\n'  + '\r\n'
-    return (lookupMessage)
-     
-def createLISTMessage(serverAddress, serverPort):
-    listMessage = 'LIST ALL' + ' ' + 'P2P-CI/1.0\r\n' + \
-                  'Host: ' + serverAddress    + '\r\n' + \
-                  'Port: ' + str(serverPort)  + '\r\n' + '\r\n'
-    return (listMessage)
-
-def parseServerResponse():
-    pass
-
-
 serverAddress = 'localhost'
 serverPort = 12000
 bufferSize = 4096
-
-#create initial dictionary of all RFCs with their titles that a client has
-clientRfcDictionary = {}
-clientRfcDictionary[413] = 'Day 0 - IP Project'
-clientRfcDictionary[250] = 'Day 1 - IP Project'
-clientRfcDictionary[758] = 'Day 2 - IP Project'
-
+clientRfcDictionary = createClientDictionary()
+    
 #open a TCP Socket, send a request and print the response
 openTCPSocketAndGetResponse(serverAddress, serverPort, bufferSize, clientRfcDictionary)
+
+
 
 
