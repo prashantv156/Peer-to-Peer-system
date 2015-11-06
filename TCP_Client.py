@@ -41,7 +41,7 @@ def createLOOKUPMessage(rfcNumber, serverAddress, serverPort, rfcTitle):
     lookupMessage = 'LOOKUP' + ' ' + 'RFC' + ' ' +  str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + \
                     'Host: '  +  serverAddress   + '\r\n' + \
                     'Port: '  +  str(serverPort) + '\r\n' + \
-                    'Title: ' + rfcTitle        + '\r\n'  + '\r\n'
+                    'Title: ' +  rfcTitle        + '\r\n'  + '\r\n'
     return (lookupMessage)
      
 def createLISTMessage(serverAddress, serverPort):
