@@ -28,8 +28,8 @@ def rfc_ht_insert(k, v):
 
 # Signal Handler for graceful connection termination
 def signal_handler(signal, frame):
-        print('You pressed Ctrl+C!')
-        # TODO - cleanup sockets over here
+        print('Got SIGINT, terminating connection')
+        serverSocket.close()
         sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -66,6 +66,7 @@ print ('The server is ready to receive')
 while True:
      connectionSocket, addr = serverSocket.accept()
      t = Thread(target=threadFunc, args=(connectionSocket, addr,))
+     t.daemon = True
      t.start()
 
 # Cleanup
