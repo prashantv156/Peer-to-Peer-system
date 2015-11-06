@@ -20,13 +20,14 @@ def openTCPSocketAndGetResponse(serverAddress, serverPort, bufferSize, clientRfc
        for key in clientRfcDictionary.keys():
            rfcNumber = key
            rfcTitle = clientRfcDictionary[rfcNumber]
-           print rfcNumber, rfcTitle
+           print  rfcNumber, rfcTitle
            s.send(createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle))
            serverResponse = s.recv(bufferSize)
-           print serverResponse
+           print "<Resp>", serverResponse, "</Resp>"
            
  
     s.close()
+    print "Socket Closed."
 
 
 def createADDMessage(rfcNumber, serverAddress, serverPort, rfcTitle):

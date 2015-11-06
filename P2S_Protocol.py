@@ -39,3 +39,20 @@ def generate_response(cmd, rfc, ver, hdrs):
 	return response
 
 
+
+
+def generateRequest(cmd, rfcNum, Title, serverAddress, serverPort):
+
+	if cmd == 'LIST':
+		rfc_field = 'ALL'
+		rfc_header = ''
+	else:
+		rfc_field = 'RFC' + ' ' + str(rfcNum)
+		rfc_header = 'Title: ' + Title + '\r\n'
+
+	request = cmd + ' ' + rfc_field + ' ' + 'P2P-CI/1.0\r\n' + \
+              'Host: '  + serverAddress   + '\r\n' + \
+              'Port: '  + str(serverPort) + '\r\n' + \
+              rfc_header + '\r\n'
+
+	return (request)
