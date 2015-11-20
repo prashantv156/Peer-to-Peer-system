@@ -4,10 +4,10 @@ from threading import Thread
 import signal
 import sys
 
-def send_P2S_request(serverAddress, serverPort, bufferSize, command, s):
+def send_P2S_request(serverAddress, uploadPort, bufferSize, command, s):
         
     if command == 'LIST':     
-       s.send(generate_request('LIST', 0, "ALL", serverAddress, serverPort))
+       s.send(generate_request('LIST', 0, "ALL", serverAddress, uploadPort))
        serverResponse = s.recv(bufferSize)
        print "<Resp>\n", serverResponse, "</Resp>"
 
@@ -19,13 +19,15 @@ def send_P2S_request(serverAddress, serverPort, bufferSize, command, s):
             rfcNumber = key
             rfcTitle = clientRfcDictionary[rfcNumber]
             print  rfcNumber, rfcTitle
-            s.send(generate_request('ADD', rfcNumber, rfcTitle, serverAddress, serverPort))
+            
+            s.send(generate_request('ADD', rfcNumber, rfcTitle, serverAddress, uploadPort))
             serverResponse = s.recv(bufferSize)
             print "<Resp>\n", serverResponse, "</Resp>"
 
 
+    # Just a test-case for now. TODO : Fix it
     if command == 'LOOKUP':
-        s.send(generate_request('LOOKUP', 413, "Day 0", serverAddress, serverPort))
+        s.send(generate_request('LOOKUP', 413, "Day 0", serverAddress, uploadPort))
         serverResponse = s.recv(bufferSize)
         print "<Resp>\n", serverResponse, "</Resp>"
 
@@ -35,6 +37,7 @@ def clientToServer():
 
     serverAddress = 'localhost'
     serverPort = 12000
+    uploadPort = 12345
     bufferSize = 4096
 
     #command = raw_input('Enter ADD/LOOKUP/LIST : ')
@@ -43,9 +46,9 @@ def clientToServer():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((serverAddress, serverPort))
 
-    send_P2S_request(serverAddress, serverPort, bufferSize, "ADD", s)
-    send_P2S_request(serverAddress, serverPort, bufferSize, "LIST", s)
-    send_P2S_request(serverAddress, serverPort, bufferSize, "LOOKUP", s)
+    send_P2S_request(serverAddress, uploadPort, bufferSize, "ADD", s)
+    send_P2S_request(serverAddress, uploadPort, bufferSize, "LIST", s)
+    send_P2S_request(serverAddress, uploadPort, bufferSize, "LOOKUP", s)
 
     s.send("EOF")
     s.close()

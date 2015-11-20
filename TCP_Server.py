@@ -9,15 +9,6 @@ serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
 serverSocket.listen(1)
 
-# Signal Handler for graceful connection termination
-def signal_handler(signal, frame):
-        print('Got SIGINT, terminating connection')
-        serverSocket.close()
-        sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
-
 # Linked Lists
 peer_list = []
 rfc_index = []
@@ -36,12 +27,54 @@ def get_upload_port(addr):
 
      return upload_port
 
+# Look for a particular RFC in the RFC-Index
+# Used for LOOKUP request processing 
 def find_rfc(rfc_num, rfc_title):
      for n, t, addr in rfc_index:
           if n == rfc_num:
                if t == rfc_title:
                     return (addr, get_upload_port(addr))
                print "Number match. Title no match!"
+
+
+
+# Cleanup all state-information for a given address
+# Called once the remote connection to the Server closes.
+def cleanup_peer_data(addr):
+     # Clean-up the Peer-List
+     del_inds = []
+     for i in range(len(peer_list)):
+          if peer_list[i][0] == addr:
+               del_inds.append(i)
+
+     for i in sorted(del_inds, reverse=True):
+          print i, "pop 1"
+          peer_list.pop(i)
+
+     # Clean-up the RFC-Index
+     del_inds = []
+     for i in range(len(rfc_index)):
+          if rfc_index[i][2] == addr:
+               del_inds.append(i)
+
+     for i in sorted(del_inds, reverse=True):
+          print i, "pop 2"
+          rfc_index.pop(i)
+
+
+
+
+
+# Signal Handler for graceful connection termination
+def signal_handler(signal, frame):
+        print('Got SIGINT, terminating connection')
+        serverSocket.close()
+        sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
+
 
 
 # Connection Handler
@@ -51,6 +84,7 @@ def threadFunc(connectionSocket, addr):
 
           # TODO - figure out how to detect remote socket close
           if message == "EOF":
+               cleanup_peer_data(addr[0])
                break
 
           if message == "":
