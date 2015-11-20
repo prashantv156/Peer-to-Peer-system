@@ -1,4 +1,4 @@
-import socket               # Import socket module
+import socket
 import pickle
 import sys
 from collections import namedtuple
@@ -6,7 +6,7 @@ import random
 import time
 import datetime
 
-PKT_SIZE = 1024
+PKT_SIZE = 4096
 DATA_SIZE = 64
 ZERO_FIELD = 0
 ACK_TYPE = 1010101010101010
@@ -14,11 +14,9 @@ ACK_TYPE = 1010101010101010
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
 ack_pkt = namedtuple('ack_pkt', 'seq_num zero_field data_type')
 
-ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         # Create a socket object
-host = socket.gethostname()  # Get local machine name
-port = 62223                 # Reserve a port for your service.
-#ack_socket.bind((host, port))         # Bind to the port
-
+host = socket.gethostname()           # Get local machine name
+port = 12345                          # Reserve a port for your service.
+ack_socket.bind((host, port))         # Bind to the port
 
 def send_ack(seq_num):
     # ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         # Create a socket object
@@ -30,7 +28,7 @@ def send_ack(seq_num):
     ack_socket.sendto(pickle.dumps(reply_message), (host, port))
 
 
-# Carry bit used in one's combliment
+# Carry bit used in one's compliment
 def carry_checksum_addition(num_1, num_2):
     c = num_1 + num_2
     return (c & 0xffff) + (c >> 16)
@@ -50,16 +48,16 @@ def calculate_checksum(message):
 
 
 
-def parse_command_line_arguments():
-    port = sys.argv[1]
-    file_name = sys.argv[2]
-    prob = sys.argv[3]
+#def parse_command_line_arguments():
+#    port = sys.argv[1]
+#    file_name = sys.argv[2]
+#    prob = sys.argv[3]
 
-    return int(port), file_name, float(prob)
+#    return int(port), file_name, float(prob)
 
 
 def main():
-    port, output_file, prob_loss = parse_command_line_arguments()
+#    port, output_file, prob_loss = parse_command_line_arguments()
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         # Create a socket object
     host = socket.gethostname()  # Get local machine name
     #port = 7735                 # Reserve a port for your service.
