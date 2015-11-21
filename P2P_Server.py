@@ -14,7 +14,8 @@ ACK_TYPE = 1010101010101010
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
 ack_pkt = namedtuple('ack_pkt', 'seq_num zero_field data_type')
 
-host = socket.gethostname()           # Get local machine name
+ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Create a socket object
+host = 'localhost'                    # Get local machine name - socket.gethostname()
 port = 12345                          # Reserve a port for your service.
 ack_socket.bind((host, port))         # Bind to the port
 
@@ -58,9 +59,12 @@ def calculate_checksum(message):
 
 def main():
 #    port, output_file, prob_loss = parse_command_line_arguments()
+    port = 12000
+    output_file = 'file_name'
+    prob_loss = 0.5
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         # Create a socket object
-    host = socket.gethostname()  # Get local machine name
-    #port = 7735                 # Reserve a port for your service.
+    host = 'localhost'           # Get local machine name - socket.gethostname()
+    port = 7734                 # Reserve a port for your service.
     s.bind((host, port))         # Bind to the port
     #prob_loss = 0.01
     #dt = str(datetime.time().second)
