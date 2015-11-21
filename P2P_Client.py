@@ -322,14 +322,15 @@ def main():
             while True:
                 chunk = f.read(int(MSS))  # Read the file MSS bytes each time Foo
                 print(chunk)
+                #print(chunk)
                 if chunk:
                     file_content.append(chunk)
                 else:
                     break
         #print(file_content)
         #test_file.close()
-    #except:
-     #   sys.exit("Failed to open file!")
+    except:
+       sys.exit("Failed to open file!")
     # start_new_thread(ack_listen_thread, (s, host, port))
     #timer()
     send_file(file_content, s, host, port)
