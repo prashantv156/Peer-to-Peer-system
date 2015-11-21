@@ -51,20 +51,22 @@ def carry_checksum_addition(num_1, num_2):
 # Calculate the checksum of the data only. Return True or False
 def calculate_checksum(message):
     # print (message)
-    # if (len(message) % 2) != 0:
-    #     message += bytes("0")
+    if (len(message) % 2) != 0:
+         message += bytes("0")
 
     checksum = 0
     for i in range(0, len(message), 2):
         my_message = str(message)
+        print(my_message[i],ord(my_message[i]))
         w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
+        print(w)
         checksum = carry_checksum_addition(checksum, w)
     return (not checksum) & 0xfff
 
 
 def pack_data(message, seq_num):
     # pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
-    # print(message, seq_num)
+    print(message, seq_num)
     pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
     print(pkt)
     # packed_pkt = pack('ihh' + str(DATA_SIZE) + 's', pkt.seq_num, pkt.checksum, pkt.data_type, bytes(pkt.data,'utf-8'))
@@ -78,7 +80,7 @@ def prepare_pkts(file_content, seq_num):
     seq_num = 0
     print(file_content)
     for item in file_content:  # Every MSS bytes should be packaged into segment Foo
-        # print(item)
+        print(item)
         # print(pkts_to_send)
         pkts_to_send.append(pack_data(item, seq_num))
         seq_num += 1
