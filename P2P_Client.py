@@ -13,7 +13,7 @@ import signal
 
 
 DATA_TYPE = 0101010101010101
-DATA_SIZE = 64   # need to be modified
+DATA_SIZE = 64  # need to be modified
 
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
 ack_pkt = namedtuple('ack_pkt', 'seq_num zero_field data_type')
@@ -26,14 +26,13 @@ seq_num = 0
 # print(file_content)
 # print (N)
 window_low = 0
-window_high = int(N)-1
+window_high = int(N) - 1
 total_pkts = 0
 RTT = 2
 pkts = []
 done_transmitting = 0
 starttime = 0
-stoptime= 0
-
+stoptime = 0
 
 ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP Foo
 host = socket.gethostname()
@@ -58,13 +57,14 @@ def calculate_checksum(message):
     checksum = 0
     for i in range(0, len(message), 2):
         my_message = str(message)
-        w = ord(my_message[i]) + (ord(my_message[i+1]) << 8)
+        w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
         checksum = carry_checksum_addition(checksum, w)
     return (not checksum) & 0xfff
 
 
 def pack_data(message, seq_num):
     # pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
+    print(message, seq_num)
     pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
     # packed_pkt = pack('ihh' + str(DATA_SIZE) + 's', pkt.seq_num, pkt.checksum, pkt.data_type, bytes(pkt.data,'utf-8'))
     my_list = [pkt.seq_num, pkt.checksum, pkt.data_type, pkt.data]
@@ -75,9 +75,12 @@ def pack_data(message, seq_num):
 def prepare_pkts(file_content, seq_num):
     pkts_to_send = []
     seq_num = 0
-    for item in file_content:   # Every MSS bytes should be packaged into segment Foo
+    print(file_content)
+    for item in file_content:  # Every MSS bytes should be packaged into segment Foo
+        print(item)
         pkts_to_send.append(pack_data(item, seq_num))
         seq_num += 1
+        print(pkts_to_send)
     return pkts_to_send
     # your code here
 
@@ -95,7 +98,8 @@ def socket_function(pkts):
     s.sendto(pkts, (host, port))
     s.close()
 
-def timer(s,f):
+
+def timer(s, f):
     global pkts
     global window_low
     global window_high
@@ -106,7 +110,7 @@ def timer(s,f):
     # print ("Timer AAAAA")
     resent_index = window_low  # resent from window_low to window_high
     if ACK == window_low:
-        print ("Timeout sequence number ="+ str(ACK))
+        print ("Timeout sequence number =" + str(ACK))
         lock.acquire()
         # print ("Timer CC")
         # print ("resent begin")
@@ -120,27 +124,27 @@ def timer(s,f):
             resent_index += 1
         lock.release()
         # print("=========")
-    # if done_transmitting == 1:
+        # if done_transmitting == 1:
         # t.cancel()
         # t._delete()
         # exit()
 
 
 def send_file(file_content, sock, hostname, port):
-
     global total_pkts
     total_pkts = len(file_content)
     # print(total_pkts)
     global pkts
     global seq_num
     global RTT
-    pkts= prepare_pkts(file_content, seq_num)
+    # print(seq_num)
+    pkts = prepare_pkts(file_content, seq_num)
     global num_pkts_sent
     # send the first window
     current_max_window = min(int(N), int(total_pkts))
     # signal.alarm(int(RTT))
     signal.setitimer(signal.ITIMER_REAL, RTT)
-    while num_pkts_sent < current_max_window :
+    while num_pkts_sent < current_max_window:
         # socket_function(pkts[num_pkts_sent], sock, hostname, port)
         # t = threading.Timer(RTT,socket_function("hello"))
         if ACK == 0:
@@ -151,36 +155,36 @@ def send_file(file_content, sock, hostname, port):
             num_pkts_sent += 1
         else:
             break
-        # data = pickle.loads(ack_socket.recv(1024))
-        # print(data[0])
-    # deal with the sliding window
-    # while num_pkts_sent < total_pkts:
-    #     global ACK
-    #     ACK = data[0]  # ack_seq
-    #     #print(ACK)
-    #     global window_low
-    #     global window_high
-    #     global num_pkts_acked
-    #     # print ("total pkts" + str(total_pkts))
-    #     if ACK:  # if ACK != null. Foo
-    #         if ACK > window_low:
-    #             temp_pckts_acked = ACK - window_low
-    #             window_high = window_high + ACK - window_low
-    #             window_low = ACK
-    #             num_pkts_acked += temp_pckts_acked  # Acked # of packages. Foo
-    #             # print ("window_high+ "+ str(window_high))
-    #             if window_high < total_pkts: # Still have packages to be sent. Foo
-    #               for i in range(min(temp_pckts_acked, total_pkts - window_high-1)): # check how many pkts left to sent. Foo
-    #                     #print(num_pkts_sent)
-    #                     sock.sendto(pkts[num_pkts_sent], (hostname, port))
-    #                     num_pkts_sent += 1
-    #                     data = pickle.loads(ack_socket.recv(1024))
-    #                     print(data[0])
+            # data = pickle.loads(ack_socket.recv(1024))
+            # print(data[0])
+            # deal with the sliding window
+            # while num_pkts_sent < total_pkts:
+            #     global ACK
+            #     ACK = data[0]  # ack_seq
+            #     #print(ACK)
+            #     global window_low
+            #     global window_high
+            #     global num_pkts_acked
+            #     # print ("total pkts" + str(total_pkts))
+            #     if ACK:  # if ACK != null. Foo
+            #         if ACK > window_low:
+            #             temp_pckts_acked = ACK - window_low
+            #             window_high = window_high + ACK - window_low
+            #             window_low = ACK
+            #             num_pkts_acked += temp_pckts_acked  # Acked # of packages. Foo
+            #             # print ("window_high+ "+ str(window_high))
+            #             if window_high < total_pkts: # Still have packages to be sent. Foo
+            #               for i in range(min(temp_pckts_acked, total_pkts - window_high-1)): # check how many pkts left to sent. Foo
+            #                     #print(num_pkts_sent)
+            #                     sock.sendto(pkts[num_pkts_sent], (hostname, port))
+            #                     num_pkts_sent += 1
+            #                     data = pickle.loads(ack_socket.recv(1024))
+            #                     print(data[0])
 
-    # while num_pkts_sent < int(N):
-    #     sock.sendto(pkts[num_pkts_sent], (hostname, port))
-    #     num_pkts_sent += 1
-    # your code here
+            # while num_pkts_sent < int(N):
+            #     sock.sendto(pkts[num_pkts_sent], (hostname, port))
+            #     num_pkts_sent += 1
+            # your code here
 
 
 def ack_listen_thread(sock, host, port):
@@ -203,75 +207,71 @@ def ack_listen_thread(sock, host, port):
         # print("num_pkts_sent "+str(num_pkts_sent))
         # print("total"+str(total_pkts))
         # print("sent"+str(num_pkts_sent))
-        if data[2]=="1010101010101010":  # data[2] is ACK identifier data[0] should be ACK sequence number. Foo
+        if data[2] == "1010101010101010":  # data[2] is ACK identifier data[0] should be ACK sequence number. Foo
             ACK = data[0]
             # print (ACK)
-            if ACK: # and ACK >= int(N):  # if ACK != null. Foo
+            if ACK:  # and ACK >= int(N):  # if ACK != null. Foo
                 # print("hello"+str(ACK))
                 # if ACK
                 lock.acquire()
-                if window_low <= ACK < total_pkts:
-                    signal.alarm(0)
-                    # signal.alarm(int(RTT))
-                    signal.setitimer(signal.ITIMER_REAL, RTT)
-                    # print(window_low)
-                    temp_pckts_acked = ACK - window_low
-                    old_window_high = window_high
-                    window_high = min(window_high + ACK - window_low, total_pkts-1)
-                    window_low = ACK
-                    num_pkts_acked += temp_pckts_acked  # Acked # of packages. Foo
-                    # print("ACK "+str(data[0]))
-                    # print("Wind_low "+str(window_low))
-                    # print("WInd_high"+str(window_high))
-                    # print("num_pkts_sent "+str(num_pkts_sent))
-                    for i in range(int(window_high-old_window_high)):
-                        socket_function(pkts[num_pkts_sent])
-                        # print("pakage "+str(num_pkts_sent)+"sent")
-                        if num_pkts_sent < total_pkts-1:
-                                num_pkts_sent += 1
+                signal.alarm(0)
+                # signal.alarm(int(RTT))
+                signal.setitimer(signal.ITIMER_REAL, RTT)
+                # print(window_low)
+                temp_pckts_acked = ACK - window_low
+                old_window_high = window_high
+                window_high = min(window_high + ACK - window_low, total_pkts - 1)
+                window_low = ACK
+                num_pkts_acked += temp_pckts_acked  # Acked # of packages. Foo
+                # print("ACK "+str(data[0]))
+                # print("Wind_low "+str(window_low))
+                # print("WInd_high"+str(window_high))
+                # print("num_pkts_sent "+str(num_pkts_sent))
+                for i in range(int(window_high - old_window_high)):
+                    socket_function(pkts[num_pkts_sent])
+                    # print("pakage "+str(num_pkts_sent)+"sent")
+                    if num_pkts_sent < total_pkts - 1:
+                        num_pkts_sent += 1
 
-                elif ACK == total_pkts:
-                    print("Done!")
-                    done_transmitting = 1
-                    stoptime = time.time()
-                    print("Running Time:",str(stoptime-starttime))
-                    exit()
-                #
-                #
-                #
-                #     if window_high <= total_pkts and int(total_pkts-ACK)>=int(N):  # Still have packages to be sent. Foo
-                #         print("state A")
-                #         for i in range(min(temp_pckts_acked, total_pkts - window_high)): # check how many pkts left to sent. Foo
-                #             #sock.sendto(pkts[8], (host, port))
-                #             signal.alarm(int(RTT))
-                #             socket_function(pkts[num_pkts_sent])
-                #             print("pakage "+str(num_pkts_sent)+"sent")
-                #             print ("state B")
-                #             #print( pkts[num_pkts_sent])
-                #             if num_pkts_sent < total_pkts-1:
-                #                 num_pkts_sent += 1
-                # elif ACK < total_pkts: # for the last windows.
-                #      print("state1")
-                #      while num_pkts_sent <total_pkts: # check how many pkts left to sent. Foo
-                #             #sock.sendto(pkts[8], (host, port))
-                #             print("state2")
-                #             signal.alarm(int(RTT))
-                #             socket_function(pkts[num_pkts_sent])
-                #             print("pakage "+str(num_pkts_sent)+"sent")
-                #             #print( pkts[num_pkts_sent])
-                #             if num_pkts_sent < total_pkts-1:
-                #                 print("state3")
-                #                 num_pkts_sent += 1
-                #         # continue  # for the last windows.
-                #
-                # elif ACK == total_pkts:
-                #     print("Done!")
-                #     done_transmitting = 1
-                #     exit()
-                lock.release()
-
-
-##
+            elif ACK == total_pkts:
+                print("Done!")
+                done_transmitting = 1
+                stoptime = time.time()
+                print("Running Time:", str(stoptime - starttime))
+                exit()
+            #
+            #
+            #
+            #     if window_high <= total_pkts and int(total_pkts-ACK)>=int(N):  # Still have packages to be sent. Foo
+            #         print("state A")
+            #         for i in range(min(temp_pckts_acked, total_pkts - window_high)): # check how many pkts left to sent. Foo
+            #             #sock.sendto(pkts[8], (host, port))
+            #             signal.alarm(int(RTT))
+            #             socket_function(pkts[num_pkts_sent])
+            #             print("pakage "+str(num_pkts_sent)+"sent")
+            #             print ("state B")
+            #             #print( pkts[num_pkts_sent])
+            #             if num_pkts_sent < total_pkts-1:
+            #                 num_pkts_sent += 1
+            # elif ACK < total_pkts: # for the last windows.
+            #      print("state1")
+            #      while num_pkts_sent <total_pkts: # check how many pkts left to sent. Foo
+            #             #sock.sendto(pkts[8], (host, port))
+            #             print("state2")
+            #             signal.alarm(int(RTT))
+            #             socket_function(pkts[num_pkts_sent])
+            #             print("pakage "+str(num_pkts_sent)+"sent")
+            #             #print( pkts[num_pkts_sent])
+            #             if num_pkts_sent < total_pkts-1:
+            #                 print("state3")
+            #                 num_pkts_sent += 1
+            #         # continue  # for the last windows.
+            #
+            # elif ACK == total_pkts:
+            #     print("Done!")
+            #     done_transmitting = 1
+            #     exit()
+            lock.release()  ##
 #     # # add something to listen ACK from server.
 #
 #
@@ -298,8 +298,8 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
 
     # comment this block when ready for command line argument
-    N = input("Please enter window size N:>")
-    MSS = input("Please enter MSS in Bytes:>")
+    # N = input("Please enter window size N:>")
+    # MSS = input("Please enter MSS in Bytes:>")
     N = 1
     MSS = 1000
     host = socket.gethostname()  # Get local machine name
@@ -309,7 +309,7 @@ def main():
     # finish comment here
 
     global window_high
-    window_high = int(N)-1
+    window_high = int(N) - 1
     # signal.signal(signal.SIGALRM, timer)
     try:
         file_content = []
@@ -319,14 +319,15 @@ def main():
         with open("haha.txt", 'rb') as f:
             while True:
                 chunk = f.read(int(MSS))  # Read the file MSS bytes each time Foo
-                print(chunk)
+                # print(chunk)
                 # print(chunk)
                 if chunk:
                     file_content.append(chunk)
+                    # print(file_content)
                 else:
                     break
-        # print(file_content)
-        # test_file.close()
+                    # print(file_content)
+                    # test_file.close()
     except:
         sys.exit("Failed to open file!")
     # start_new_thread(ack_listen_thread, (s, host, port))
