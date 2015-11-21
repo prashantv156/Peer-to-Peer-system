@@ -64,8 +64,9 @@ def calculate_checksum(message):
 
 def pack_data(message, seq_num):
     # pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
-    print(message, seq_num)
+    # print(message, seq_num)
     pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
+    print(pkt)
     # packed_pkt = pack('ihh' + str(DATA_SIZE) + 's', pkt.seq_num, pkt.checksum, pkt.data_type, bytes(pkt.data,'utf-8'))
     my_list = [pkt.seq_num, pkt.checksum, pkt.data_type, pkt.data]
     packed_pkt = pickle.dumps(my_list)
@@ -77,10 +78,12 @@ def prepare_pkts(file_content, seq_num):
     seq_num = 0
     print(file_content)
     for item in file_content:  # Every MSS bytes should be packaged into segment Foo
-        print(item)
+        # print(item)
+        # print(pkts_to_send)
         pkts_to_send.append(pack_data(item, seq_num))
         seq_num += 1
-        print(pkts_to_send)
+        print(seq_num)
+        # print(pkts_to_send)
     return pkts_to_send
     # your code here
 
@@ -301,7 +304,7 @@ def main():
     # N = input("Please enter window size N:>")
     # MSS = input("Please enter MSS in Bytes:>")
     N = 1
-    MSS = 1000
+    MSS = 5
     host = socket.gethostname()  # Get local machine name
     print("Host:", host)
     port = 7735  # Reserve a port for your service.
