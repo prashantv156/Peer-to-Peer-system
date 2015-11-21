@@ -12,7 +12,7 @@ import signal
 # python client.py
 
 
-DATA_TYPE = 0b101010101010101
+DATA_TYPE = 0101010101010101
 DATA_SIZE = 64   #need to be modified
 
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
@@ -116,7 +116,7 @@ def timer(s,f):
            # print ("resent "+ str(resent_index))
             # signal.alarm(0)
             # signal.alarm(int(RTT))
-            signal.alarm(0)
+            signal.alarm(5)
             signal.setitimer(signal.ITIMER_REAL, RTT)
             socket_function(pkts[resent_index])
             resent_index += 1
@@ -294,16 +294,16 @@ def main():
     global starttime
     starttime = time.time()
     # Uncomment this when ready for command line argument
-    host, port, my_test_file, N, MSS = parse_command_line_arguments()
+   # host, port, my_test_file, N, MSS = parse_command_line_arguments()
     #adam's host = lil_boss
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
 
     # comment this block when ready for command line argument
-   # N = input("Please enter window size N:>")
-   # MSS = input("Please enter MSS in Bytes:>")
-    #N = 1
-    #MSS = 1000
-    #host = socket.gethostname()  # Get local machine name
+    N = input("Please enter window size N:>")
+    MSS = input("Please enter MSS in Bytes:>")
+    N = 1
+    MSS = 1000
+    host = socket.gethostname()  # Get local machine name
     print("Host:", host)
     port = 7735  # Reserve a port for your service.
     #my_test_file = 'test.pdf'
@@ -311,12 +311,13 @@ def main():
 
     global window_high
     window_high = int(N)-1
-    signal.signal(signal.SIGALRM, timer)
+    #signal.signal(signal.SIGALRM, timer)
     try:
         file_content = []
         #test_file = open(my_test_file, 'rb')
 
-        with open(my_test_file, 'rb') as f:
+        #with open(my_test_file, 'rb') as f:
+        with open("haha.txt", 'rb') as f:
             while True:
                 chunk = f.read(int(MSS))  # Read the file MSS bytes each time Foo
                 if chunk:
@@ -325,8 +326,8 @@ def main():
                     break
         #print(file_content)
         #test_file.close()
-    except:
-        sys.exit("Failed to open file!")
+    #except:
+     #   sys.exit("Failed to open file!")
     # start_new_thread(ack_listen_thread, (s, host, port))
     #timer()
     send_file(file_content, s, host, port)
@@ -334,6 +335,7 @@ def main():
     #global threading_first_window
     #threading_first_window = threading.Thread(target=send_file, args=(file_content, s, host, port))
     #threading_first_window.start()
+
     s.close()  # Close the socket when done
 
 
