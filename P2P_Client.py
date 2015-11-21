@@ -129,6 +129,7 @@ def timer(s,f):
 
 
 def send_file(file_content, sock, hostname, port):
+
     global total_pkts
     total_pkts = len(file_content)
     #print(total_pkts)
@@ -320,6 +321,7 @@ def main():
         with open("haha.txt", 'rb') as f:
             while True:
                 chunk = f.read(int(MSS))  # Read the file MSS bytes each time Foo
+                print(chunk)
                 if chunk:
                     file_content.append(chunk)
                 else:
