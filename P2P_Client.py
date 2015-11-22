@@ -205,7 +205,11 @@ def ack_listen_thread(sock, host, port):
     # global threading_first_window
     while True:
         # threading_first_window.stop()
-        data = pickle.loads(ack_socket.recv(256))
+        # data = pickle.loads(ack_socket.recv(256))
+        data = []
+        data[0] = "00000000000000000000000000000001"
+        data[1] = "0000000000000000"
+        data[2] = "1010101010101010"
         # print("ACK "+str(data[0]))
         # print("Wind_low "+str(window_low))
         # print("WInd_high"+str(window_high))
