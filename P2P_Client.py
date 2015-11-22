@@ -58,7 +58,7 @@ def calculate_checksum(message):
     for i in range(0, len(message), 2):
         my_message = str(message)
         print(my_message[i],ord(my_message[i]))
-        w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
+        w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)   # ord: return string in bytes
         print(w)
         checksum = carry_checksum_addition(checksum, w)
     return (not checksum) & 0xfff
@@ -205,20 +205,24 @@ def ack_listen_thread(sock, host, port):
     # global threading_first_window
     while True:
         # threading_first_window.stop()
-        data = pickle.loads(ack_socket.recv(256))
+        # data = pickle.loads(ack_socket.recv(256))
+        data = []
+        data[0] = "00000000000000000000000000000001"
+        data[1] = "0000000000000000"
+        data[2] = "1010101010101010"
         # print("ACK "+str(data[0]))
-        # print("Wind_low "+str(window_low))
-        # print("WInd_high"+str(window_high))
-        # print("num_pkts_sent "+str(num_pkts_sent))
+        print("Wind_low "+str(window_low))
+        print("Wind_high"+str(window_high))
+        print("num_pkts_sent "+str(num_pkts_sent))
         # print("total"+str(total_pkts))
         # print("sent"+str(num_pkts_sent))
         if data[2] == "1010101010101010":  # data[2] is ACK identifier data[0] should be ACK sequence number. Foo
-            ACK = data[0]
+            ACK = data[0]  # sequence number
             # print (ACK)
             if ACK:  # and ACK >= int(N):  # if ACK != null. Foo
                 # print("hello"+str(ACK))
                 # if ACK
-                lock.acquire()
+                lock.acquire()  # lock is RLock, ensuring concurrent connections
                 signal.alarm(0)
                 # signal.alarm(int(RTT))
                 signal.setitimer(signal.ITIMER_REAL, RTT)
