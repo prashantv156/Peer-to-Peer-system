@@ -124,7 +124,7 @@ def timer(s, f):
             # signal.alarm(0)
             # signal.alarm(int(RTT))
             signal.alarm(5)
-            signal.setitimer(signal.ITIMER_REAL, RTT)
+            # signal.setitimer(signal.ITIMER_REAL, RTT)
             socket_function(pkts[resent_index])
             resent_index += 1
         lock.release()
@@ -147,8 +147,9 @@ def send_file(file_content, sock, hostname, port):
     global num_pkts_sent
     # send the first window
     current_max_window = min(int(N), int(total_pkts))
-    # signal.alarm(int(RTT))
-    signal.setitimer(signal.ITIMER_REAL, RTT)
+    # signal.alarm(int(RTT)) # after RTT seconds, output alarm signal
+    # signal.signal
+    # signal.setitimer(signal.ITIMER_REAL, RTT)
     while num_pkts_sent < current_max_window:
         # socket_function(pkts[num_pkts_sent], sock, hostname, port)
         # t = threading.Timer(RTT,socket_function("hello"))
@@ -211,18 +212,18 @@ def ack_listen_thread(sock, host, port):
         data[1] = "0000000000000000"
         data[2] = "1010101010101010"
         # print("ACK "+str(data[0]))
-        # print("Wind_low "+str(window_low))
-        # print("WInd_high"+str(window_high))
-        # print("num_pkts_sent "+str(num_pkts_sent))
-        # print("total"+str(total_pkts))
-        # print("sent"+str(num_pkts_sent))
+        print("Wind_low "+str(window_low))
+        print("WInd_high"+str(window_high))
+        print("num_pkts_sent "+str(num_pkts_sent))
+        print("total"+str(total_pkts))
+        print("sent"+str(num_pkts_sent))
         if data[2] == "1010101010101010":  # data[2] is ACK identifier data[0] should be ACK sequence number. Foo
             ACK = data[0]
             # print (ACK)
             if ACK:  # and ACK >= int(N):  # if ACK != null. Foo
                 # print("hello"+str(ACK))
                 # if ACK
-                lock.acquire()
+                lock.acquire()  # concurrent lock
                 signal.alarm(0)
                 # signal.alarm(int(RTT))
                 signal.setitimer(signal.ITIMER_REAL, RTT)
