@@ -56,16 +56,18 @@ def calculate_checksum(message):
     checksum = 0
     for i in range(0, len(message), 2):
         my_message = str(message)
-        print(my_message[i], ord(my_message[i]))
+        # print(my_message[i], ord(my_message[i]))
         w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
         print(w)
         checksum = carry_checksum_addition(checksum, w)
-    return (not checksum) & 0xfff
+    checksum = bin(checksum^0xffff)
+    return checksum
 
 
 def pack_data(message, seq_num):
     # pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
     print(message, seq_num)
+    print(calculate_checksum(message))
     pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
     print(pkt)
     # packed_pkt = pack('ihh' + str(DATA_SIZE) + 's', pkt.seq_num, pkt.checksum, pkt.data_type, bytes(pkt.data,'utf-8'))
@@ -205,7 +207,11 @@ def ack_listen_thread(sock, host, port):
     # global threading_first_window
     while True:
         # threading_first_window.stop()
-        data = pickle.loads(ack_socket.recv(256))
+        # data = pickle.loads(ack_socket.recv(256))
+        data = []
+        data.append("00000000000000000000000000000001")
+        data.append("0000000000000000")
+        data.append("1010101010101010")
         # print("ACK "+str(data[0]))
         # print("Wind_low "+str(window_low))
         # print("WInd_high"+str(window_high))
