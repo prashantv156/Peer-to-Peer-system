@@ -1,10 +1,9 @@
+import pickle
 import socket  # Import socket module
 import sys
 from collections import namedtuple
-import pickle
 # from _thread import *
 import threading
-import inspect
 import time
 import signal
 
@@ -36,7 +35,7 @@ stoptime = 0
 
 ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP Foo
 host = socket.gethostname()
-ack_port_num = 62223
+ack_port_num = 1300
 ack_socket.bind((host, ack_port_num))
 
 lock = threading.RLock()  # for lock sth
@@ -52,12 +51,12 @@ def carry_checksum_addition(num_1, num_2):
 def calculate_checksum(message):
     # print (message)
     if (len(message) % 2) != 0:
-         message += bytes("0")
+        message += bytes("0")
 
     checksum = 0
     for i in range(0, len(message), 2):
         my_message = str(message)
-        print(my_message[i],ord(my_message[i]))
+        print(my_message[i], ord(my_message[i]))
         w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
         print(w)
         checksum = carry_checksum_addition(checksum, w)
@@ -206,84 +205,80 @@ def ack_listen_thread(sock, host, port):
     # global threading_first_window
     while True:
         # threading_first_window.stop()
-        # data = pickle.loads(ack_socket.recv(256))
-        data = []
-        data[0] = "00000000000000000000000000000001"
-        data[1] = "0000000000000000"
-        data[2] = "1010101010101010"
+        data = pickle.loads(ack_socket.recv(256))
         # print("ACK "+str(data[0]))
-        print("Wind_low "+str(window_low))
-        print("WInd_high"+str(window_high))
-        print("num_pkts_sent "+str(num_pkts_sent))
-        print("total"+str(total_pkts))
-        print("sent"+str(num_pkts_sent))
+        # print("Wind_low "+str(window_low))
+        # print("WInd_high"+str(window_high))
+        # print("num_pkts_sent "+str(num_pkts_sent))
+        # print("total"+str(total_pkts))
+        # print("sent"+str(num_pkts_sent))
         if data[2] == "1010101010101010":  # data[2] is ACK identifier data[0] should be ACK sequence number. Foo
             ACK = data[0]
             # print (ACK)
             if ACK:  # and ACK >= int(N):  # if ACK != null. Foo
                 # print("hello"+str(ACK))
                 # if ACK
-                lock.acquire()  # concurrent lock
-                signal.alarm(0)
-                # signal.alarm(int(RTT))
-                signal.setitimer(signal.ITIMER_REAL, RTT)
-                # print(window_low)
-                temp_pckts_acked = ACK - window_low
-                old_window_high = window_high
-                window_high = min(window_high + ACK - window_low, total_pkts - 1)
-                window_low = ACK
-                num_pkts_acked += temp_pckts_acked  # Acked # of packages. Foo
-                # print("ACK "+str(data[0]))
-                # print("Wind_low "+str(window_low))
-                # print("WInd_high"+str(window_high))
-                # print("num_pkts_sent "+str(num_pkts_sent))
-                for i in range(int(window_high - old_window_high)):
-                    socket_function(pkts[num_pkts_sent])
-                    # print("pakage "+str(num_pkts_sent)+"sent")
-                    if num_pkts_sent < total_pkts - 1:
-                        num_pkts_sent += 1
+                lock.acquire()
+                if window_low <= ACK < total_pkts:
+                    signal.alarm(0)
+                    # signal.alarm(int(RTT))
+                    signal.setitimer(signal.ITIMER_REAL, RTT)
+                    # print(window_low)
+                    temp_pckts_acked = ACK - window_low
+                    old_window_high = window_high
+                    window_high = min(window_high + ACK - window_low, total_pkts - 1)
+                    window_low = ACK
+                    num_pkts_acked += temp_pckts_acked  # Acked # of packages. Foo
+                    # print("ACK "+str(data[0]))
+                    # print("Wind_low "+str(window_low))
+                    # print("WInd_high"+str(window_high))
+                    # print("num_pkts_sent "+str(num_pkts_sent))
+                    for i in range(int(window_high - old_window_high)):
+                        socket_function(pkts[num_pkts_sent])
+                        # print("pakage "+str(num_pkts_sent)+"sent")
+                        if num_pkts_sent < total_pkts - 1:
+                            num_pkts_sent += 1
 
-            elif ACK == total_pkts:
-                print("Done!")
-                done_transmitting = 1
-                stoptime = time.time()
-                print("Running Time:", str(stoptime - starttime))
-                exit()
-            #
-            #
-            #
-            #     if window_high <= total_pkts and int(total_pkts-ACK)>=int(N):  # Still have packages to be sent. Foo
-            #         print("state A")
-            #         for i in range(min(temp_pckts_acked, total_pkts - window_high)): # check how many pkts left to sent. Foo
-            #             #sock.sendto(pkts[8], (host, port))
-            #             signal.alarm(int(RTT))
-            #             socket_function(pkts[num_pkts_sent])
-            #             print("pakage "+str(num_pkts_sent)+"sent")
-            #             print ("state B")
-            #             #print( pkts[num_pkts_sent])
-            #             if num_pkts_sent < total_pkts-1:
-            #                 num_pkts_sent += 1
-            # elif ACK < total_pkts: # for the last windows.
-            #      print("state1")
-            #      while num_pkts_sent <total_pkts: # check how many pkts left to sent. Foo
-            #             #sock.sendto(pkts[8], (host, port))
-            #             print("state2")
-            #             signal.alarm(int(RTT))
-            #             socket_function(pkts[num_pkts_sent])
-            #             print("pakage "+str(num_pkts_sent)+"sent")
-            #             #print( pkts[num_pkts_sent])
-            #             if num_pkts_sent < total_pkts-1:
-            #                 print("state3")
-            #                 num_pkts_sent += 1
-            #         # continue  # for the last windows.
-            #
-            # elif ACK == total_pkts:
-            #     print("Done!")
-            #     done_transmitting = 1
-            #     exit()
-            lock.release()  ##
-#     # # add something to listen ACK from server.
-#
+                elif ACK == total_pkts:
+                    print("Done!")
+                    done_transmitting = 1
+                    stoptime = time.time()
+                    print("Running Time:", str(stoptime - starttime))
+                    exit()  #
+    #
+    #
+    #     if window_high <= total_pkts and int(total_pkts-ACK)>=int(N):  # Still have packages to be sent. Foo
+    #         print("state A")
+    #         for i in range(min(temp_pckts_acked, total_pkts - window_high)): # check how many pkts left to sent. Foo
+    #             #sock.sendto(pkts[8], (host, port))
+    #             signal.alarm(int(RTT))
+    #             socket_function(pkts[num_pkts_sent])
+    #             print("pakage "+str(num_pkts_sent)+"sent")
+    #             print ("state B")
+    #             #print( pkts[num_pkts_sent])
+    #             if num_pkts_sent < total_pkts-1:
+    #                 num_pkts_sent += 1
+    # elif ACK < total_pkts: # for the last windows.
+    #      print("state1")
+    #      while num_pkts_sent <total_pkts: # check how many pkts left to sent. Foo
+    #             #sock.sendto(pkts[8], (host, port))
+    #             print("state2")
+    #             signal.alarm(int(RTT))
+    #             socket_function(pkts[num_pkts_sent])
+    #             print("pakage "+str(num_pkts_sent)+"sent")
+    #             #print( pkts[num_pkts_sent])
+    #             if num_pkts_sent < total_pkts-1:
+    #                 print("state3")
+    #                 num_pkts_sent += 1
+    #         # continue  # for the last windows.
+    #
+    # elif ACK == total_pkts:
+    #     print("Done!")
+    #     done_transmitting = 1
+    #     exit()
+    lock.release()  ##  # # # add something to listen ACK from server.  #
+
+
 #
 
 
