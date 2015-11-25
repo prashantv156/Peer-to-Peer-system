@@ -11,7 +11,7 @@ import signal
 # python client.py
 
 
-DATA_TYPE = 0101010101010101
+DATA_TYPE = 0b0101010101010101
 DATA_SIZE = 64  # need to be modified
 
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
@@ -26,6 +26,7 @@ seq_num = 0
 # print (N)
 window_low = 0
 window_high = int(N) - 1
+print(window_high)
 total_pkts = 0
 RTT = 2
 pkts = []
@@ -60,7 +61,7 @@ def calculate_checksum(message):
         w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
         print(w)
         checksum = carry_checksum_addition(checksum, w)
-    checksum = bin(checksum^0xffff)
+    checksum = bin(checksum ^ 0xffff)
     return checksum
 
 
@@ -226,6 +227,7 @@ def ack_listen_thread(sock, host, port):
                 # if ACK
                 lock.acquire()
                 if window_low <= ACK < total_pkts:
+                    print(ACK)
                     signal.alarm(0)
                     # signal.alarm(int(RTT))
                     signal.setitimer(signal.ITIMER_REAL, RTT)
@@ -343,6 +345,7 @@ def main():
         sys.exit("Failed to open file!")
     # start_new_thread(ack_listen_thread, (s, host, port))
     # timer()
+    print(window_high, window_low)
     send_file(file_content, s, host, port)
     threading.Thread(target=ack_listen_thread, args=(s, host, port)).start()
     # global threading_first_window
