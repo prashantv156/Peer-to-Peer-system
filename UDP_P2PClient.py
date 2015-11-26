@@ -15,12 +15,9 @@ peerAddress = 'localhost'
 peerPort = 11000
 bufferSize = 4096
 s = socket(AF_INET,SOCK_DGRAM)
-s.sendto(createGETMessage(750, peerAddress, peerPort),(peerAddress, peerPort))
-print(s.recv(bufferSize))
+s.sendto(createGETMessage(250, peerAddress, peerPort),(peerAddress, peerPort))
+print('\r\n' + s.recv(bufferSize))
 s.close()
-
-
-
 
     
 

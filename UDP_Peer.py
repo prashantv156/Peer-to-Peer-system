@@ -11,8 +11,7 @@ def signal_handler(signal, frame):
         # TODO - cleanup sockets over here
         sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
-
-
+       
 def createServerSocket():
 
         welcomePort = 11000
@@ -42,15 +41,13 @@ while 1:
         message, peerAddr = s.recvfrom(4096)
         print message
         for (cmd, rfc, ver), headers in parse_requests(message):
-                
-                if validate(cmd, rfc, ver, headers):
-                        t = Thread(target=peerThread, args=(createNotFoundError(), peerAddr,))
+                flag, infoMessage = validate(cmd, rfc, ver, headers)
+                if flag:
+                        t = Thread(target=peerThread, args=(infoMessage, peerAddr,))
                         t.start()
                 else:
-                        peerAddress = peerAddr[0]
-                        peerPort = peerAddr[1]
-                        s.sendto('Error ! Connection cannot be established', (peerAddress, peerPort))
-                          
+                        s.sendto(infoMessage, (peerAddr[0], peerAddr[1]))
+                         
 
 s.close()
   

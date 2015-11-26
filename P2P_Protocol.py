@@ -1,12 +1,10 @@
 import platform
-
+from P2S_Protocol import *
 
 
 def createGETMessage(rfcNumber, serverAddress, serverPort):
 
     os = platform.system() + platform.release()
-
-
     getMessage =  'GET' + ' ' + 'RFC' + ' ' + str(rfcNumber) + ' ' + 'P2P-CI/1.0\r\n' + \
                   'Host: '  + str(serverAddress)   + '\r\n' + \
                   'Port: '  + str(serverPort)      + '\r\n' + \
@@ -15,20 +13,24 @@ def createGETMessage(rfcNumber, serverAddress, serverPort):
 
 
 def createNotFoundError():
-    print('404 Not Found')
+    return('404 Not Found')
 
 def createBadRequestError():
-    print('400 Bad Request')
+    return('400 Bad Request')
 
 def createVersionError():
-    print('505 P2P-CI Version Not Supported')
+    return('505 P2P-CI Version Not Supported')
 
 
 def ifExistsRfc(rfc):
 
+    clientRfcDictionary = createClientDictionary()
     rfcCode, rfcNumber = rfc.strip().split(" ")
-    print rfcCode, rfcNumber
-    return False
+    if (int(rfcNumber) in clientRfcDictionary):
+        return True
+    else:
+        print 'requested RFC does not exist'
+        return False
     
 
 
@@ -63,18 +65,21 @@ def parse_requests(str):
 
 def validate(command, rfc, version, headers):
 
-    if ifExistsRfc(rfc):
+    if (ifExistsRfc(rfc)):
         if version == 'P2P-CI/1.0' and command == 'GET':
-            return True
+            flag = True
+            status = 'success'
         elif version != 'P2P-CI/1.0':
-            createVersionError()
-            return False
+            flag = False
+            status = createVersionError()
         elif command != 'GET':
-            createBadRequestError()
-            return False
+            flag = False
+            status = createBadRequestError()
     else:
-        createNotFoundError()
-        return False
+        flag = False
+        status = createNotFoundError()
+
+    return (flag, status)
     
        
 

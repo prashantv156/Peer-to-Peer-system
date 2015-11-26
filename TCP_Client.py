@@ -13,9 +13,8 @@ def send_P2S_request(serverAddress, uploadPort, bufferSize, command, s):
 
     
     if command == 'ADD':
-        clientRfcDictionary = createClientDictionary()
-        for key in clientRfcDictionary.keys():
-
+        clientRfcDictionary = createClientDictionary()       
+        for key in clientRfcDictionary.keys():           
             rfcNumber = key
             rfcTitle = clientRfcDictionary[rfcNumber]
             print  rfcNumber, rfcTitle
@@ -39,7 +38,8 @@ def clientToServer():
     serverPort = 12000
     uploadPort = 12345
     bufferSize = 4096
-
+    
+    
     #command = raw_input('Enter ADD/LOOKUP/LIST : ')
 
     #open a TCP Socket, send a request and print the response
