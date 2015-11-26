@@ -1,145 +1,83 @@
-import socket
-import pickle
-import sys
-from collections import namedtuple
-import random
-import time
-import datetime
-
-PKT_SIZE = 4096
-DATA_SIZE = 64
-ZERO_FIELD = 0
-ACK_TYPE = 1010101010101010
-
-data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
-ack_pkt = namedtuple('ack_pkt', 'seq_num zero_field data_type')
-
-ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Create a socket object
-host = 'localhost'                    # Get local machine name - socket.gethostname()
-port = 12345                          # Reserve a port for your service.
-ack_socket.bind((host, port))         # Bind to the port
-
-def send_ack(seq_num):
-    # ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         # Create a socket object
-    # host = socket.gethostname()  # Get local machine name
-    # port = 62223                 # Reserve a port for your service.
-    # #ack_socket.bind((host, port))         # Bind to the port
-    reply_message = [seq_num, "0000000000000000", "1010101010101010"]
-    # print(reply_message)
-    ack_socket.sendto(pickle.dumps(reply_message), (host, port))
+import socket  # Import Socket Module
+import sys  #Import System Parameter
+import time  #Import Time Module
+import pickle  #Import Object Serialization Module
+import random  #Import Random Module
+import datetime  #Import date and time module
 
 
-# Carry bit used in one's compliment
-def carry_checksum_addition(num_1, num_2):
-    c = num_1 + num_2
-    return (c & 0xffff) + (c >> 16)
+ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
+host = socket.gethostname()  # Get local machine name
+port = 62223  # Reserve a port for your service.
+ack_socket.bind((host, port))  # Bind to the port
 
 
-# Calculate the checksum of the data only. Return True or False
-def calculate_checksum(message):
-    # if (len(message) % 2) != 0:
-    #     message += bytes("0")
-
-    checksum = 0
-    for i in range(0, len(message), 2):
-        my_message = str(message)
-        w = ord(my_message[i]) + (ord(my_message[i+1]) << 8)
-        checksum = carry_checksum_addition(checksum, w)
-    return (not checksum) & 0xffff
+#Calculate the Checksum of the data being received.
+def cal_chksm(rcvd_msg):
+   chksm = 0;  #Initial value for checksum
+   for i in range(0, len(rcvd_msg), 2)
+       msg = str(rcvd_msg)
+       w = ord(msg[i]) + (ord(msg[i+1]) << 8)  #Return the unicode code point
+       chksm = cary_adn(chksm, w)  #Funtion call to add carry
+       return (not chksm) & 0xffff  #Returning the value as True or False
 
 
-
-#def parse_command_line_arguments():
-#    port = sys.argv[1]
-#    file_name = sys.argv[2]
-#    prob = sys.argv[3]
-
-#    return int(port), file_name, float(prob)
+#Adding the carry to the checksum if generated.
+def cary_adn(n1, n2):
+    c = n1 + n2
+    return (c & 0xffff) + (c >> 16)  #Returning the value after carry addtion
 
 
+#Getting the values from the CLI
+def parse_cli_arg():
+    prt = sys.argv[1]  #Get the port number for the service
+    fl_name = sys.argv[2]  #Get the filename to store the file
+    prb = sys.argv[3]  #Define the probability for UDP reliability
+    return int(port), fl_name, float(prb) #Return the values from CLI
+
+
+def snd_ack(sq_nm):
+    rply_msg = [sq_nm, "0000000000000000", "1010101010101010"]  #Reply Message Format
+    ack_socket.sendto(pickle.dumps(rply_msg), (hst, prt))  #Send ACK to the Sender as String
+
+
+#Main Function
 def main():
-#    port, output_file, prob_loss = parse_command_line_arguments()
-    port = 12000
-    output_file = 'file_name'
-    prob_loss = 0.5
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         # Create a socket object
-    host = 'localhost'           # Get local machine name - socket.gethostname()
-    port = 7734                 # Reserve a port for your service.
-    s.bind((host, port))         # Bind to the port
-    #prob_loss = 0.01
-    #dt = str(datetime.time().second)
-    #d = random.randrange(0, 1000000)
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    #output_file = 'file_'+str(timestr)+'.pdf'
-    lost_seq_num = []
-    print_message = []
-    packet_lost = False
-    exp_seq_num = 0
+    prt, output_file, prb_ls = parse_cli_arg()  #Function call for the values from the CLI
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #Create a socket object
+    hst = socket.gethostname()  #Get local machine name
+    s.bind((hst, prt))  #Bind the port
+    tmstr = time.strftime("%Y%m%d-%H%M%S")  #Importing a time stamp
+    lst_sq_nm = []  #Define an Array for lost srquence numbers
+    prnt_msg = []  #Define an Array for Printing message
+    pkt_lst = False  #Variable for defining lost packet
+    exp_sq_nm = 0  #Variable for expected sequence number
     while True:
-
-        data, addr = s.recvfrom(1000000)
-        data = pickle.loads(data)
-
-        seq_num, checksum, data_type, message = data[0], data[1], data[2], data[3]
-        #print("Data: ", str(message))
-        rand_loss = random.random()
-
-        if rand_loss <= prob_loss:
-            print("Packet loss, sequence number = ", seq_num)
-            packet_lost = True
-            if len(lost_seq_num) == 0:
-                lost_seq_num.append(seq_num)
-            if len(lost_seq_num) > 0:
-                if seq_num not in lost_seq_num and (seq_num>min(lost_seq_num)):
-                    lost_seq_num.append(seq_num)
+        data, addr = s.recvfrom(1000000)  #Get the Buffered data as a string and address of the socket sending data
+        data = pickle.loads(data)  #Read pickled object from the string of data
+        sq_nm, chksm, data_type, rcvd_msg = data[0], data[1], data[2], data[3]  #Define the parameters from the pickled object
+        rnd_lst = random.random() #Return a number from 0.0 to 1.0 to implement the probability function
+        if rnd_lst <= prb_ls  #Check the random number with the probability from the CLI
+            print("Lost packet with sequence number = ", sq_nm)
+            pkt_lst = True
+            if len(lst_sq_nm) == 0:
+                lst_sq_nm.append(sq_nm)  #Append the sequence number
+            if len(lst_sq_nm) > 0:
+                if sq_nm not in lst_sq_nm and (sq_nm>min(lst_sq_nm)):  
+                    lst_sq_nm.append(sq_nm)  #Append the sequence number
+                else:
+                    if chksm != cal_chksm(rcvd_msg):  #Compare the calculated and the received checksum
+                        print("Packet being dropped as the checksum doesn't match.")
         else:
-            if checksum != calculate_checksum(message):
-                print("Packet dropped, checksum doesn't match!")
-            #else:
-            if seq_num == exp_seq_num:
-               # print (seq_num)
-                ack_seq = int(seq_num)+1
-               # print("ACK "+ str(ack_seq))
-                send_ack(ack_seq)
-                print_message.append(seq_num)
-                with open(output_file, 'ab') as file:
-                    file.write(message)
-                exp_seq_num += 1
+            if sq_nm == exp_sq_nm:
+                ack_sq = int(sq_nm)+1  #Increment the sequence number
+                snd_ack(ack_sq)  #Function call for sending the acknowledgement
+                prnt_msg.append(sq_num)  #Append the sequence number
+                with open(output_file, 'ab') as file:  #Open the File
+                    file.write(msg)  #Write the message on the file
+                exp_sq_nm += 1  #Increment the Expected sequence number
 
-        #     elif not packet_lost:
-        #         #if lost_seq_num
-        #         print (seq_num)
-        #         ack_seq = int(seq_num)+1
-        #         print("ACK "+ str(ack_seq))
-        #         send_ack(ack_seq)
-        #         print_message.append(seq_num)
-        #         with open(output_file, 'ab') as file:
-        #             file.write(message)
-        #     else:
-        #         print("print meeeeeeeee")
-        #         print("Seq_num: ", seq_num)
-        #         print("lost_seq_num: ", lost_seq_num)
-        #         if packet_lost and (seq_num == min(lost_seq_num)):
-        #             print("my_ack--------")
-        #             ack_seq = int(seq_num)+1
-        #             print("ACK "+ str(ack_seq))
-        #             send_ack(ack_seq)
-        #             lost_seq_num.remove(seq_num)
-        #             print_message.append(seq_num)
-        #             with open(output_file, 'ab') as file:
-        #                 file.write(message)
-        #             if len(lost_seq_num) < 1:
-        #                 packet_lost = False
-        #         else:
-        #             print("I don't this lost:"+str(packet_lost))
-        #             print("I don't this seq_num"+str(seq_num))
-        #             print("I don't this lost_seq_num",lost_seq_num)
-        #             pass
-        # if str(ack_seq) == "1455":
-        #     for element in print_message:
-        #         print(print_message[element])
-
-        #print('Sequence number:', seq_num, '\nChecksum:', checksum, '\nData type:', bin(data_type), '\nMessage:', message)
 
 if __name__ == "__main__":
     main()
+    
