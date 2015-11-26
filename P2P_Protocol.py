@@ -1,6 +1,7 @@
 import platform
 
 
+
 def createGETMessage(rfcNumber, serverAddress, serverPort):
 
     os = platform.system() + platform.release()
@@ -14,13 +15,21 @@ def createGETMessage(rfcNumber, serverAddress, serverPort):
 
 
 def createNotFoundError():
-    return ('404 Not Found')
+    print('404 Not Found')
 
 def createBadRequestError():
-    return('400 Bad Request')
+    print('400 Bad Request')
 
 def createVersionError():
-    return ('505 P2P-CI Version Not Supported')
+    print('505 P2P-CI Version Not Supported')
+
+
+def ifExistsRfc(rfc):
+
+    rfcCode, rfcNumber = rfc.strip().split(" ")
+    print rfcCode, rfcNumber
+    return False
+    
 
 
 def parse_requests(str):
@@ -50,5 +59,23 @@ def parse_requests(str):
 		ret.append( ((cl[0], " ".join(cl[1:-1]), cl[-1]), hdrs) )
 
 	return (ret)
+
+
+def validate(command, rfc, version, headers):
+
+    if ifExistsRfc(rfc):
+        if version == 'P2P-CI/1.0' and command == 'GET':
+            return True
+        elif version != 'P2P-CI/1.0':
+            createVersionError()
+            return False
+        elif command != 'GET':
+            createBadRequestError()
+            return False
+    else:
+        createNotFoundError()
+        return False
+    
+       
 
 

@@ -20,10 +20,6 @@ def createServerSocket():
         s.bind(('', welcomePort))
         return s
 
-def parseRequest(data):
-
-        return true  
-
 
 #connection handler
 def peerThread(message, peerAddr):
@@ -31,22 +27,29 @@ def peerThread(message, peerAddr):
         s = socket(AF_INET, SOCK_DGRAM)
         peerAddress = peerAddr[0]
         peerPort = peerAddr[1]
+        print 'message received from peer at  ' + str(peerAddress) + '  ' + str(peerPort)
         s.sendto(message, (peerAddress, peerPort))
         s.close()     
         
 
+
 # P2P process
 
 s = createServerSocket()
+print 'peer is ready to receive'
 
 while 1:
         message, peerAddr = s.recvfrom(4096)
+        print message
         for (cmd, rfc, ver), headers in parse_requests(message):
-                print headers
-                print (cmd, rfc, ver)
-                if rfc == 'RFC 750':
+                
+                if validate(cmd, rfc, ver, headers):
                         t = Thread(target=peerThread, args=(createNotFoundError(), peerAddr,))
                         t.start()
+                else:
+                        peerAddress = peerAddr[0]
+                        peerPort = peerAddr[1]
+                        s.sendto('Error ! Connection cannot be established', (peerAddress, peerPort))
                           
 
 s.close()

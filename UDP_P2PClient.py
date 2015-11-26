@@ -1,6 +1,7 @@
 from socket import *
 from P2P_Protocol import *
 import signal
+import sys
 
 # Signal Handler for graceful connection termination
 def signal_handler(signal, frame):
