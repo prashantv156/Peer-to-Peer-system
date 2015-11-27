@@ -13,11 +13,22 @@ signal.signal(signal.SIGINT, signal_handler)
 
 peerAddress = 'localhost'
 peerPort = 11000
-bufferSize = 4096
+bufferSize = 2048
 s = socket(AF_INET,SOCK_DGRAM)
-s.sendto(createGETMessage(250, peerAddress, peerPort),(peerAddress, peerPort))
-print('\r\n' + s.recv(bufferSize))
-s.close()
+s.sendto(createGETMessage(1918, peerAddress, peerPort),(peerAddress, peerPort))
+filename = "rfc1918copy.pdf"
+
+try:
+        with open(filename, 'wb') as f:
+                data, addr = s.recvfrom(bufferSize)
+                while data:
+                        f.write(data)
+                        s.settimeout(2)
+                        data, addr = s.recvfrom(bufferSize)
+except timeout:
+        f.close()
+        s.close()
+        print "File Downloaded" 
 
     
 

@@ -21,29 +21,50 @@ def createServerSocket():
 
 
 #connection handler
-def peerThread(message, peerAddr):
+def peerThread(rfc, ver, headers, peerAddr):
 
         s = socket(AF_INET, SOCK_DGRAM)
         peerAddress = peerAddr[0]
         peerPort = peerAddr[1]
-        print 'message received from peer at  ' + str(peerAddress) + '  ' + str(peerPort)
-        s.sendto(message, (peerAddress, peerPort))
-        s.close()     
+        bufferSize = 2048
+        print 'message received from peer_client at  ' + str(peerAddress) + '  ' + str(peerPort)
+        #TODO: generate the response for a GET request and attach the RFC file to the response
+        rfcCode, rfcNumber = rfc.strip().split(' ')
+        filename = "rfc1918.pdf"
+
+        try:
+                with open(filename, 'rb') as f:
+                        data = f.read(bufferSize)
+                        while data:
+                                if data:
+                                        s.sendto(data,(peerAddress, peerPort))
+                                        print 'sending....'
+                                        data = f.read(bufferSize)
+                                else:
+                                        break
+                        
+
+        except:
+                sys.exit("Failed to open file")
+
+        print 'File Sent'
+        s.close()
+
         
+               
 
 
 # P2P process
-
 s = createServerSocket()
-print 'peer is ready to receive'
+print 'peer_server is ready to receive'
 
-while 1:
+while True:
         message, peerAddr = s.recvfrom(4096)
         print message
         for (cmd, rfc, ver), headers in parse_requests(message):
                 flag, infoMessage = validate(cmd, rfc, ver, headers)
                 if flag:
-                        t = Thread(target=peerThread, args=(infoMessage, peerAddr,))
+                        t = Thread(target=peerThread, args=(rfc, ver, headers, peerAddr,))
                         t.start()
                 else:
                         s.sendto(infoMessage, (peerAddr[0], peerAddr[1]))

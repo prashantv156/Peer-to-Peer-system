@@ -1,4 +1,5 @@
 import platform
+from datetime import *
 from P2S_Protocol import *
 
 
@@ -10,6 +11,16 @@ def createGETMessage(rfcNumber, serverAddress, serverPort):
                   'Port: '  + str(serverPort)      + '\r\n' + \
                   'OS: '    + os                   + '\r\n' + '\r\n'
     return (getMessage)
+
+#TODO: generate the message headers 
+def generate_peer_response_body():
+
+    os = platform.system() + ' ' + platform.release()
+    date = datetime.now()
+    lastModified = ''
+    contentType = 'text/text/'
+    responseBody = ''
+    
 
 
 def createNotFoundError():
@@ -33,34 +44,34 @@ def ifExistsRfc(rfc):
         return False
     
 
-
-def parse_requests(str):
-
-	ret = []	# Parsed Request Command Queue
-
-	# Can get multiple request packets in a message.
-	# Split based on P2S end-of-request delimiter
-
-	for req in str.strip().split("\r\n\r\n"):
-		# re-init
-		cl, hdrs = [], {}
-
-		# clean up string and get lines
-		req_lns = req.strip().split("\r\n")	
-
-		# parse the P2S Command line
-		cl = req_lns[0].split(" ")
-
-		# parse P2S header lines
-		for l in req_lns[1:]:				
-			hdr = l.strip().split(" ")
-			hdrs[hdr[0][:-1]] = " ".join(hdr[1:])
-						# ^-- removes the ":" at the end of each header_name
-	
-		# add parsed command to the queue
-		ret.append( ((cl[0], " ".join(cl[1:-1]), cl[-1]), hdrs) )
-
-	return (ret)
+##
+##def parse_requests(str):
+##
+##	ret = []	# Parsed Request Command Queue
+##
+##	# Can get multiple request packets in a message.
+##	# Split based on P2S end-of-request delimiter
+##
+##	for req in str.strip().split("\r\n\r\n"):
+##		# re-init
+##		cl, hdrs = [], {}
+##
+##		# clean up string and get lines
+##		req_lns = req.strip().split("\r\n")	
+##
+##		# parse the P2S Command line
+##		cl = req_lns[0].split(" ")
+##
+##		# parse P2S header lines
+##		for l in req_lns[1:]:				
+##			hdr = l.strip().split(" ")
+##			hdrs[hdr[0][:-1]] = " ".join(hdr[1:])
+##						# ^-- removes the ":" at the end of each header_name
+##	
+##		# add parsed command to the queue
+##		ret.append( ((cl[0], " ".join(cl[1:-1]), cl[-1]), hdrs) )
+##
+##	return (ret)
 
 
 def validate(command, rfc, version, headers):

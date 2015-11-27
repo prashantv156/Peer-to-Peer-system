@@ -87,7 +87,7 @@ def createClientDictionary():
 
     #create initial dictionary of all RFCs with their titles that a client has
     clientRfcDictionary = {}
-    clientRfcDictionary[413] = 'Day 0'
+    clientRfcDictionary[1918] = 'rfc1918'
     clientRfcDictionary[250] = 'Day 1'
     clientRfcDictionary[758] = 'Day 2'
     clientRfcDictionary[600] = 'Day 3'
