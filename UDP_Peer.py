@@ -3,6 +3,7 @@ from threading import Thread
 from P2P_Protocol import *
 import signal
 import sys
+from rdt import *
 
 
 # Signal Handler for graceful connection termination
@@ -26,7 +27,6 @@ def peerThread(rfc, ver, headers, peerAddr):
         s = socket(AF_INET, SOCK_DGRAM)
         peerAddress = peerAddr[0]
         peerPort = peerAddr[1]
-        bufferSize = 2048
         print 'message received from peer_client at  ' + str(peerAddress) + '  ' + str(peerPort)
         #TODO: generate the response for a GET request and attach the RFC file to the response
         rfcCode, rfcNumber = rfc.strip().split(' ')
@@ -34,12 +34,13 @@ def peerThread(rfc, ver, headers, peerAddr):
 
         try:
                 with open(filename, 'rb') as f:
-                        data = f.read(bufferSize)
+                        data = f.read(MSS)
                         while data:
                                 if data:
-                                        s.sendto(data,(peerAddress, peerPort))
+                                        #s.sendto(data,(peerAddress, peerPort))
+                                        rdt_send(s, data,(peerAddress, peerPort))
                                         print 'sending....'
-                                        data = f.read(bufferSize)
+                                        data = f.read(MSS)
                                 else:
                                         break
                         
