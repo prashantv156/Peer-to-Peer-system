@@ -6,6 +6,9 @@ import random  #Import Random Module
 import datetime  #Import date and time module
 """
 
+from collections import namedtuple
+import pickle
+
 MSS = 2048 - 8
 
 DATA_TYPE = 0b0101010101010101
@@ -24,21 +27,6 @@ def pack_data(message, seq_num):
     my_list = [pkt.seq_num, pkt.checksum, pkt.data_type, pkt.data]
     packed_pkt = pickle.dumps(my_list)
     return packed_pkt
-
-
-"""def prepare_pkts(file_content, seq_num):
-    pkts_to_send = []
-    seq_num = 0
-    #print(file_content)
-    for item in file_content:  # Every MSS bytes should be packaged into segment Foo
-        # print(item)
-        # print(pkts_to_send)
-        pkts_to_send.append(pack_data(item, seq_num))
-        seq_num += 1
-        # print(seq_num)
-        # print(pkts_to_send)
-    return pkts_to_send
-"""
 
 def carry_checksum_addition(num_1, num_2):
     c = num_1 + num_2
@@ -72,7 +60,7 @@ def rdt_send(s, msg, (peerAddress, peerPort)):
 	# bad ack/ time out -> resend
 	# if all ack return
 	s.sendto(msg, (peerAddress, peerPort))
-	print msg, (calculate_checksum(msg))
+	print(pack_data(msg,seq_num))
 
 def rdt_recv(s):
 	if True:
