@@ -30,7 +30,7 @@ def peerThread(rfc, ver, headers, peerAddr):
         print 'message received from peer_client at  ' + str(peerAddress) + '  ' + str(peerPort)
         #TODO: generate the response for a GET request and attach the RFC file to the response
         rfcCode, rfcNumber = rfc.strip().split(' ')
-        filename = "rfc1918.pdf"
+        filename = "haha.txt"
 
         try:
                 with open(filename, 'rb') as f:

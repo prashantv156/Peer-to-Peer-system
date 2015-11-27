@@ -8,10 +8,11 @@ import datetime  #Import date and time module
 
 MSS = 2048 - 8
 
+
+
 def carry_checksum_addition(num_1, num_2):
     c = num_1 + num_2
     return (c & 0xffff) + (c >> 16)
-
 
 # Calculate the checksum of the data only. Return True or False
 def calculate_checksum(message):
@@ -24,10 +25,13 @@ def calculate_checksum(message):
         my_message = str(message)
         # print(my_message[i], ord(my_message[i]))
         w = ord(my_message[i]) + (ord(my_message[i + 1]) << 8)
-        print(w)
+        #print(w)
         checksum = carry_checksum_addition(checksum, w)
     checksum = bin(checksum ^ 0xffff)
     return checksum
+
+
+
 
 
 def rdt_send(s, msg, (peerAddress, peerPort)):
@@ -40,7 +44,7 @@ def rdt_send(s, msg, (peerAddress, peerPort)):
 	# bad ack/ time out -> resend
 	# if all ack return
 	s.sendto(msg, (peerAddress, peerPort))
-	print(calculate_checksum(msg))
+	print msg, (calculate_checksum(msg))
 
 def rdt_recv(s):
 	if True:
