@@ -8,7 +8,7 @@ import datetime  #Import date and time module
 
 ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
 host = socket.gethostname()  # Get local machine name
-port = 62223  # Reserve a port for your service.
+port = 62223  # Reserve a port for your service
 ack_socket.bind((host, port))  # Bind to the port
 
 
@@ -36,6 +36,7 @@ def parse_cli_arg():
     return int(port), fl_name, float(prb) #Return the values from CLI
 
 
+#Sending the Ack to the Sender
 def snd_ack(sq_nm):
     rply_msg = [sq_nm, "0000000000000000", "1010101010101010"]  #Reply Message Format
     ack_socket.sendto(pickle.dumps(rply_msg), (hst, prt))  #Send ACK to the Sender as String
@@ -69,15 +70,17 @@ def main():
                     if chksm != cal_chksm(rcvd_msg):  #Compare the calculated and the received checksum
                         print("Packet being dropped as the checksum doesn't match.")
         else:
-            if sq_nm == exp_sq_nm:
-                ack_sq = int(sq_nm)+1  #Increment the sequence number
-                snd_ack(ack_sq)  #Function call for sending the acknowledgement
-                prnt_msg.append(sq_num)  #Append the sequence number
-                with open(output_file, 'ab') as file:  #Open the File
-                    file.write(msg)  #Write the message on the file
-                exp_sq_nm += 1  #Increment the Expected sequence number
+            if chksm != cal_chksm(rcvd_msg):  #Compare the calculated and the received checksum
+                        print("Packet being dropped as the checksum doesn't match.")
+            else:
+               if sq_nm == exp_sq_nm:
+                   ack_sq = int(sq_nm)+1  #Increment the sequence number
+                   snd_ack(ack_sq)  #Function call for sending the acknowledgement
+                   prnt_msg.append(sq_num)  #Append the sequence number
+                   with open(output_file, 'ab') as file:  #Open the File
+                       file.write(msg)  #Write the message on the file
+                   exp_sq_nm += 1  #Increment the Expected sequence number
 
 
 if __name__ == "__main__":
     main()
-    
