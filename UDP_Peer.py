@@ -34,13 +34,13 @@ def peerThread(rfc, ver, headers, peerAddr):
 
         try:
                 with open(filename, 'rb') as f:
-                        data = f.read(MSS)
+                        data = f.read(5*MSS)
                         while data:
                                 if data:
                                         #s.sendto(data,(peerAddress, peerPort))
                                         rdt_send(s, data,(peerAddress, peerPort))
                                         print 'sending....'
-                                        data = f.read(MSS)
+                                        data = f.read(5*MSS)
                                 else:
                                         break
                         

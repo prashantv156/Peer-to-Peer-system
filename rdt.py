@@ -8,26 +8,29 @@ import datetime  #Import date and time module
 
 from collections import namedtuple
 import pickle
+import math
 
-MSS = 2048 - 8
+MSS = 64-8	#2048 - 8
 
 DATA_TYPE = 0b0101010101010101
 
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
-ack_pkt = namedtuple('ack_pkt', 'seq_num zero_field data_type')
 seq_num = 0
 
-def pack_data(message, seq_num):
-    # pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
-    # print(message, seq_num)
-    # print(calculate_checksum(message))
-    pkt = data_pkt(seq_num, calculate_checksum(message), DATA_TYPE, message)
-    # print(pkt)
-    # packed_pkt = pack('ihh' + str(DATA_SIZE) + 's', pkt.seq_num, pkt.checksum, pkt.data_type, bytes(pkt.data,'utf-8'))
+#
+# Add headers and pickle
+#
+def pack_data(message, sno):
+    pkt = data_pkt(sno, calculate_checksum(message), DATA_TYPE, message)
     my_list = [pkt.seq_num, pkt.checksum, pkt.data_type, pkt.data]
     packed_pkt = pickle.dumps(my_list)
     return packed_pkt
 
+
+
+#
+# Check-Sum Calculation
+#
 def carry_checksum_addition(num_1, num_2):
     c = num_1 + num_2
     return (c & 0xffff) + (c >> 16)
@@ -50,25 +53,57 @@ def calculate_checksum(message):
 
 
 
+#send_buff = []
+#send_buff_ln = 0
 def rdt_send(s, msg, (peerAddress, peerPort)):
+	#send_buff.append(msg)
+	#send_buff_ln += len(msg)
 
-	# split into MSS
-	# add headers
+	#if send_buff_ln < MSS:
+		#pass
+		# add 1 sec timer			#TODO
+		#return
+
+
+	# if larger, split into MSS sized segments
+	segs = []
+	for i in range(int(math.ceil(1.0*len(msg)/MSS))):
+		segs.append(pack_data(msg[i*MSS:(i+1)*MSS], i))
+
+	# add padding
+
+
 	# send chunks till window full
 	# wait
 	# slide window
 	# bad ack/ time out -> resend
 	# if all ack return
-	s.sendto(msg, (peerAddress, peerPort))
-	print(pack_data(msg,seq_num))
+
+	# add headers
+	#out = pack_data(msg,seq_num)
+
+	#s.sendto(out, (peerAddress, peerPort))
+
+	print "sending out ", len(segs)," number of segs" 
+	for seg in segs:
+		s.sendto(seg, (peerAddress, peerPort))
 
 def rdt_recv(s):
 	if True:
 	# until we fill buffer upto buffSize
-		message, peerAddr = s.recvfrom(MSS + 8)
+
+		print "rdt_recv"
+		# Strip apart the headers and Data
+		message, peerAddr = s.recvfrom(MSS + 8 + 128)	# 128 added since pickling is failing without extra space
+														# TODO - Fix!!
+		(sq_nm, chksm, data_type, rcvd_msg) = pickle.loads(message)  #Read pickled object from the string of data
+		#print "RECV"
+        #print sq_nm, chksm, data_type, rcvd_msg
+
 		#buffer += message
 		# drop packets
 		# strip headers
 		# check cheksum
 		# send ACK
-	return message, peerAddr
+
+	return rcvd_msg, peerAddr
