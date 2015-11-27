@@ -121,7 +121,7 @@ def timer(s, f):
         lock.acquire()
         # print ("Timer CC")
         # print ("resent begin")
-        while resent_index <= window_high and resent_index < total_pkts:
+        while resent_index <= window_high and resent_index < total_pkts: # resend all the remaining packets
             # print ("resent "+ str(resent_index))
             # signal.alarm(0)
             # signal.alarm(int(RTT))
@@ -208,11 +208,11 @@ def ack_listen_thread(sock, host, port):
     # global threading_first_window
     while True:
         # threading_first_window.stop()
-        # data = pickle.loads(ack_socket.recv(256))
-        data = []
-        data.append("00000000000000000000000000000001")
-        data.append("0000000000000000")
-        data.append("1010101010101010")
+        data = pickle.loads(ack_socket.recv(256))
+        # data = []
+        # data.append("00000000000000000000000000000001")
+        # data.append("0000000000000000")
+        # data.append("1010101010101010")
         # print("ACK "+str(data[0]))
         # print("Wind_low "+str(window_low))
         # print("WInd_high"+str(window_high))
@@ -225,10 +225,10 @@ def ack_listen_thread(sock, host, port):
             if ACK:  # and ACK >= int(N):  # if ACK != null. Foo
                 # print("hello"+str(ACK))
                 # if ACK
-                lock.acquire()
+                # lock.acquire()
                 if window_low <= ACK < total_pkts:
                     print(ACK)
-                    signal.alarm(0)
+                    signal.alarm(0)  # disable the alarm
                     # signal.alarm(int(RTT))
                     signal.setitimer(signal.ITIMER_REAL, RTT)
                     # print(window_low)
