@@ -11,6 +11,7 @@ import pickle
 import math
 
 MSS = 64-8	#2048 - 8
+N 	= 3
 
 DATA_TYPE = 0b0101010101010101
 
@@ -65,13 +66,14 @@ def rdt_send(s, msg, (peerAddress, peerPort)):
 		#return
 
 
-	# if larger, split into MSS sized segments
 	segs = []
-	for i in range(int(math.ceil(1.0*len(msg)/MSS))):
-		segs.append(pack_data(msg[i*MSS:(i+1)*MSS], i))
+	num_segs = int(math.ceil(1.0*len(msg)/MSS))
 
-	# add padding
+	# if larger, split into MSS sized segments
+	for i in range(num_segs):
+		segs.append(pack_data(msg[i*MSS : (i+1)*MSS], i))
 
+	# add padding to last one
 
 	# send chunks till window full
 	# wait
@@ -87,6 +89,9 @@ def rdt_send(s, msg, (peerAddress, peerPort)):
 	print "sending out ", len(segs)," number of segs" 
 	for seg in segs:
 		s.sendto(seg, (peerAddress, peerPort))
+
+
+
 
 def rdt_recv(s):
 	if True:
