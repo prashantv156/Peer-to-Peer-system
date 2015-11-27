@@ -10,6 +10,11 @@ from collections import namedtuple
 import pickle
 import math
 
+ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
+host = 'localhost'  # Get local machine name
+port = 62223  # Reserve a port for your service
+ack_socket.bind((host, port))  # Bind to the port
+
 MSS = 64-8	#2048 - 8
 N 	= 3
 
@@ -17,6 +22,14 @@ DATA_TYPE = 0b0101010101010101
 
 data_pkt = namedtuple('data_pkt', 'seq_num checksum data_type data')
 seq_num = 0
+
+#
+#Sending the Ack to the Sender
+#
+def snd_ack(sno):
+    rply_msg = [sno, "0000000000000000", "1010101010101010"]  #Reply Message Format
+    ack_socket.sendto(pickle.dumps(rply_msg), (host, port))  #Send ACK to the Sender as String
+
 
 #
 # Add headers and pickle
@@ -105,10 +118,13 @@ def rdt_recv(s):
 		#print "RECV"
         #print sq_nm, chksm, data_type, rcvd_msg
 
+
+                ack_seq = int(seq_num)+1  #Increment the sequence number
+                   snd_ack(ack_seq)  #Function call for sending the acknowledgement
+                   
 		#buffer += message
 		# drop packets
 		# strip headers
 		# check cheksum
-		# send ACK
 
 	return rcvd_msg, peerAddr
