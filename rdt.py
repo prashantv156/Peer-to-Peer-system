@@ -9,6 +9,7 @@ import datetime  #Import date and time module
 from collections import namedtuple
 import pickle
 import math
+import socket
 
 ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
 host = 'localhost'  # Get local machine name
@@ -28,6 +29,7 @@ seq_num = 0
 #
 def snd_ack(sno):
     rply_msg = [sno, "0000000000000000", "1010101010101010"]  #Reply Message Format
+    print rply_msg
     ack_socket.sendto(pickle.dumps(rply_msg), (host, port))  #Send ACK to the Sender as String
 
 
@@ -120,7 +122,7 @@ def rdt_recv(s):
 
 
                 ack_seq = int(seq_num)+1  #Increment the sequence number
-                   snd_ack(ack_seq)  #Function call for sending the acknowledgement
+                send_ack(ack_seq)  #Function call for sending the acknowledgement
                    
 		#buffer += message
 		# drop packets
