@@ -30,17 +30,18 @@ def peerThread(rfc, ver, headers, peerAddr):
         print 'message received from peer_client at  ' + str(peerAddress) + '  ' + str(peerPort)
         #TODO: generate the response for a GET request and attach the RFC file to the response
         rfcCode, rfcNumber = rfc.strip().split(' ')
-        filename = "rfc1918.pdf"
+        filename = "haha.txt"
 
         try:
                 with open(filename, 'rb') as f:
-                        data = f.read(MSS)
+
+                        data = f.read(5*MSS)
                         while data:                                                                   
                                 p2p_response = generate_peer_resp_body(ver, filename, data)
                                 #s.sendto(data,(peerAddress, peerPort))
                                 rdt_send(s, p2p_response,(peerAddress, peerPort))
                                 print 'sending....'
-                                data = f.read(MSS)                                                        
+                                data = f.read(5*MSS)                                                                                
 
         except:
                 sys.exit("Failed to open file")

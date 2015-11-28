@@ -16,7 +16,8 @@ peerAddress = 'localhost'
 peerPort = 11000
 s = socket(AF_INET,SOCK_DGRAM)
 s.sendto(createGETMessage(1918, peerAddress, peerPort),(peerAddress, peerPort))
-filename = "rfc1918copy.pdf"
+filename = "haha_copy.txt"
+
 try:
         with open(filename, 'wb') as f:
                 #data, addr = s.recvfrom(bufferSize)
