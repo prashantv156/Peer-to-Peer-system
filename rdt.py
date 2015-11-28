@@ -72,16 +72,44 @@ def calculate_checksum(message):
 
 #send_buff = []
 #send_buff_ln = 0
-
 def rdt_send(s, msg, (peerAddress, peerPort)):
+	#send_buff.append(msg)
+	#send_buff_ln += len(msg)
 
-	# split into MSS
-	# add headers
-	# send chunks till window full
-	# wait
-	# slide window
-	# bad ack/ time out -> resend
-	# if all ack return
+	#if send_buff_ln < MSS:
+		#pass
+		# add 1 sec timer			#TODO
+		#return
+
+	segs = []
+	num_segs = int(math.ceil(1.0*len(msg)/MSS))
+	done = False
+
+	# if larger, split into MSS sized segments
+	for i in range(num_segs):
+		# add headers and store in segs array
+		segs.append(pack_data(msg[i*MSS : (i+1)*MSS], i))
+
+	# add padding to last one
+	acks = [False]*num_segs
+	timestamps = [0]*num_segs	# seconds since epoch
+	window_start = 0
+
+	print "sending out ", len(segs)," number of segs" 
+	for i in range(len(segs)):
+		# TODO - should send from window_start to +N
+		s.sendto(segs[i], (peerAddress, peerPort))
+		timestamps[i] = int(time.time())
+
+	print timestamps
+	print acks	
+
+	while (not done):
+		print "Listening for ACKs..."
+		# get ACKs,
+		# check
+		done = True
+
 	s.sendto(msg, (peerAddress, peerPort))
 
 def rdt_recv(s):
@@ -97,12 +125,12 @@ def rdt_recv(s):
         #print sq_nm, chksm, data_type, rcvd_msg
 
 
-                ack_seq = int(seq_num)+1  #Increment the sequence number
-                send_ack(ack_seq)  #Function call for sending the acknowledgement
+        ack_seq = int(seq_num)+1  #Increment the sequence number
+        send_ack(ack_seq)  #Function call for sending the acknowledgement
 
 		#buffer += message
 		# drop packets
 		# strip headers
 		# check cheksum
 		# send ACK
-	return message, peerAddr
+	return rcvd_msg, peerAddr
