@@ -1,4 +1,4 @@
-from socket import *
+#from socket import *
 from P2P_Protocol import *
 import signal
 import sys

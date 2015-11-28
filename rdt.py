@@ -10,7 +10,7 @@ import datetime  #Import date and time module
 from collections import namedtuple
 import pickle
 import math
-import socket
+from socket import *
 
 #ack_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create a socket object
 #host = 'localhost'  # Get local machine name
