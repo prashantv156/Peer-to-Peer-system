@@ -22,7 +22,7 @@ def rdt_send(s, msg, (peerAddress, peerPort)):
 def rdt_recv(s):
 	if True:
 	# until we fill buffer upto buffSize
-		message, peerAddr = s.recvfrom(MSS + 8)
+		message, peerAddr = s.recvfrom(MSS + 1024)
 		#buffer += message
 		# drop packets
 		# strip headers

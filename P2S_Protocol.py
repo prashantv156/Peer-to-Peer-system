@@ -31,7 +31,8 @@ def parse_requests(str):
 
 
 def generate_resp_hdr(ver):
-	return (ver + ' ' + '200' + ' ' + 'OK' + '\r\n'	+ '\r\n')
+##	return (ver + ' ' + '200' + ' ' + 'OK' + '\r\n'	+ '\r\n')
+        return (ver + ' ' + '200' + ' ' + 'OK' + '\r\n')
 
 def generate_resp_body(rfc, title, client_ip, client_up_port):
 	return (rfc + ' ' + title + ' ' + client_ip + ' ' +  str(client_up_port) + '\r\n')

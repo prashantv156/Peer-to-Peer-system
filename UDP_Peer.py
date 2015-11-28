@@ -35,15 +35,12 @@ def peerThread(rfc, ver, headers, peerAddr):
         try:
                 with open(filename, 'rb') as f:
                         data = f.read(MSS)
-                        while data:
-                                if data:
-                                        #s.sendto(data,(peerAddress, peerPort))
-                                        rdt_send(s, data,(peerAddress, peerPort))
-                                        print 'sending....'
-                                        data = f.read(MSS)
-                                else:
-                                        break
-                        
+                        while data:                                                                   
+                                p2p_response = generate_peer_resp_body(ver, filename, data)
+                                #s.sendto(data,(peerAddress, peerPort))
+                                rdt_send(s, p2p_response,(peerAddress, peerPort))
+                                print 'sending....'
+                                data = f.read(MSS)                                                        
 
         except:
                 sys.exit("Failed to open file")
